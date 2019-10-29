@@ -1,26 +1,21 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import ProtectedRouteMap from './utils/ProtectedRouteMap.route'
+import { mapForMobile } from './mapsForMobile'
+import { welcomeScreen } from './welcomeScreen'
+import { Route, Switch } from 'react-router-dom'
 
-function App() {
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <main>
+      <Switch>
+        <Route exact path = "/" component  = {welcomeScreen} />
+        <ProtectedRouteMap exact path = '/mapForMobile' component = { mapForMobile } mapsForMobile />
+        <Route path = "*" component = { () => "404 NOT FOUND"} ></Route>
+      </Switch>
+      {/* <enigmoAdmin></enigmoAdmin> */}
+    </main>   
+  )
 }
 
 export default App;
