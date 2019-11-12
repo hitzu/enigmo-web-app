@@ -74,7 +74,7 @@ const MapForMobile = (props) =>{
                 // console.log(x.length)
                 // setCajeros(hola)
                 const result = await getMapData(locationData.latitude, locationData.longitude)
-                setCajeros(result.data.cajeros.slice(1,20000))
+                setCajeros(result.data.cajeros.slice(1,200))
 
                 
             }
