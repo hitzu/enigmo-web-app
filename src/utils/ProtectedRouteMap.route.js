@@ -10,7 +10,7 @@ const ProtectedRouteMap = ( {component : Component, ...rest} ) => {
                     console.log("jajajaja xD")
                     return <Component {...props} />
                 } else {
-                    return ( 
+                    return (
                         <Redirect to = {
                             {
                                 pathname : "/",
