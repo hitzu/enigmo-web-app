@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { getMapData } from "../mapsCluster/services"
+import axios from 'axios'
 
 const styles = {
     width: "100vw",
@@ -56,7 +57,7 @@ const MapWithJavaScript = (props) => {
         const initializeMap = async ({ setMap, mapContainer }) => {
             const map = new mapboxgl.Map({
                 container: mapContainer.current,
-                style: "mapbox://styles/mapbox/navigation-preview-night-v2", // stylesheet location
+                style: "mapbox://styles/mapbox/streets-v9", // stylesheet location
                 center: [locationData.longitude, locationData.latitude],
                 zoom: locationData.zoom
             });

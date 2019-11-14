@@ -11,16 +11,32 @@ class MapsCluster extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      lng: 5,
-      lat: 34,
-      zoom: 1.5
+      lng: props.match.params.lng,
+      lat: props.match.params.lat,
+      zoom: 4
     };
   }
 
-  getGeoJsonFeature = (location,deltaLog,deltaLat)=>{
+  // getGeoJsonFeature = (location,deltaLog,deltaLat)=>{
+  //   return {
+  //     "type": "Feature", "properties": { "id": Math.round(5000*Math.random()+1)+""+Date.now(), "mag": (5*Math.random()+1), "time": 1506794299451, "felt": null, "tsunami": 0 }, "geometry": { "type": "Point", "coordinates": [ location.lon+deltaLog,location.lat+deltaLat ] }
+  //   }
+  // }
+
+  getGeoJsonFeature = (item, typeItem) => {
+    let location = item.location.coordinates
     return {
-      "type": "Feature", "properties": { "id": Math.round(5000*Math.random()+1)+""+Date.now(), "mag": (5*Math.random()+1), "time": 1506794299451, "felt": null, "tsunami": 0 }, "geometry": { "type": "Point", "coordinates": [ location.lon+deltaLog,location.lat+deltaLat ] }
-    }
+      "type" : "Feature", 
+      "properties" : {
+        "mag": (5*Math.random()+1),
+        "type" : typeItem,
+        "item" : item
+      },
+      "geometry" : { 
+        "type": "Point", 
+        "coordinates": location 
+      }
+    }  
   }
 
   componentDidMount() {
@@ -54,30 +70,39 @@ class MapsCluster extends React.Component {
     
     map.on('load', async  ()=> {
 
-      const response = await axios.get('https://raw.githubusercontent.com/ivansabik/ubicajeros-api/master/cajeros.json');
+      // const response = await axios.get('https://raw.githubusercontent.com/ivansabik/ubicajeros-api/master/cajeros.json');
 
-      for (const item of response.data.cajeros) {
-        dataGeojson.features.push(this.getGeoJsonFeature(item,0,0))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,10,21))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,16,-55))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,22,-35))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,29,-28))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,32,-20))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,0,-9))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,5,0))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,9,5))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,10,9))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,16,10))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,22,16))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,29,22))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,32,29))
-        // dataGeojson.features.push(this.getGeoJsonFeature(item,38,32))
-       
-       
+      // for (const item of response.data.cajeros) {
+      //   dataGeojson.features.push(this.getGeoJsonFeature(item,0,0))
+      // }
+
+      const enigmoData = await axios({
+      url : `http://192.168.0.23:3003/stamp/sniffer`,
+      method : 'POST',
+      data : {
+          "distance":30000000,
+          "latitude": 19.0384369, 
+          "longitude":-98.2190501,
+          "promotions" : true,
+          "events" : true
+          }
+      })
+
+      for (const item of enigmoData.data.SnifferCards) {
+        dataGeojson.features.push(this.getGeoJsonFeature(item, "SnifferCards"))
       }
-      
 
-      console.log("termineee.------");
+      for (const item of enigmoData.data.SnifferPromotions) {
+        dataGeojson.features.push(this.getGeoJsonFeature(item, "SnifferPromotions"))
+      }
+
+      for (const item of enigmoData.data.event) {
+        dataGeojson.features.push(this.getGeoJsonFeature(item, "event"))
+      }
+
+      for (const item of enigmoData.data.locationsCards) {
+        dataGeojson.features.push(this.getGeoJsonFeature(item, "locationsCards"))
+      }
       
       // add a clustered GeoJSON source for a sample set of earthquakes
       map.addSource('earthquakes', {
@@ -150,7 +175,6 @@ class MapsCluster extends React.Component {
       
       
       map.on('click', 'clusters', function (e) {
-        
         var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
         var clusterId = features[0].properties.cluster_id;
         map.getSource('earthquakes').getClusterExpansionZoom(clusterId, function (err, zoom) {
@@ -209,12 +233,9 @@ class MapsCluster extends React.Component {
       for (var i = 0; i < features.length; i++) {
         var coords = features[i].geometry.coordinates;
         var props = features[i].properties;
-        // console.log(props);
 
         if (!props.cluster) {
-          
-
-            var id = props.id;
+          var id = props.id;
           
           var marker = markers[id];
           if (!marker) {
@@ -230,7 +251,6 @@ class MapsCluster extends React.Component {
 
         }else{
           var id = props.cluster_id;
-          
           var marker = markers[id];
           if (!marker) {
             var el = createDonutChart(props);
