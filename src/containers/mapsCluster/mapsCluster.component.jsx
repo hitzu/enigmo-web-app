@@ -1,7 +1,8 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
+import ReactDOM from 'react-dom'
+import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.component'
 
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY
@@ -16,12 +17,6 @@ class MapsCluster extends React.Component {
       zoom: 4
     };
   }
-
-  // getGeoJsonFeature = (location,deltaLog,deltaLat)=>{
-  //   return {
-  //     "type": "Feature", "properties": { "id": Math.round(5000*Math.random()+1)+""+Date.now(), "mag": (5*Math.random()+1), "time": 1506794299451, "felt": null, "tsunami": 0 }, "geometry": { "type": "Point", "coordinates": [ location.lon+deltaLog,location.lat+deltaLat ] }
-  //   }
-  // }
 
   getGeoJsonFeature = (item, typeItem) => {
     let location = item.location.coordinates
@@ -62,25 +57,9 @@ class MapsCluster extends React.Component {
     const SnifferPromotions = ['==', ['get', 'typeToElement'], 'SnifferPromotions'];
     const event = ['==', ['get', 'typeToElement'], 'event'];
     const locationsCards = ['==', ['get', 'typeToElement'], 'locationsCards'];
-
-    const colors = ['#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3','#fdb462','#b3de69','#fccde5','#d9d9d9','#bc80bd','#ccebc5','#ffed6f'];
-    // // filters for classifying earthquakes into five categories based on magnitude
-    // var mag1 = ["<", ["get", "mag"], 2];
-    // var mag2 = ["all", [">=", ["get", "mag"], 2], ["<", ["get", "mag"], 3]];
-    // var mag3 = ["all", [">=", ["get", "mag"], 3], ["<", ["get", "mag"], 4]];
-    // var mag4 = ["all", [">=", ["get", "mag"], 4], ["<", ["get", "mag"], 5]];
-    // var mag5 = [">=", ["get", "mag"], 5];
-    
-    // // colors to use for the categories
-    // var colors = ['#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c'];
+    const graffiti = ['==', ['get', 'typeToElement'], 'graffiti'];
     
     map.on('load', async  ()=> {
-
-      // const response = await axios.get('https://raw.githubusercontent.com/ivansabik/ubicajeros-api/master/cajeros.json');
-
-      // for (const item of response.data.cajeros) {
-      //   dataGeojson.features.push(this.getGeoJsonFeature(item,0,0))
-      // }
 
       const enigmoDataReceived = await axios({
       url : `http://192.168.10.149:3003/stamp/sniffer`,
@@ -126,8 +105,6 @@ class MapsCluster extends React.Component {
         enigmoData.features.push(this.getGeoJsonFeature(item, "locationsCards"))
       }
 
-      console.log(enigmoData)
-
       map.addSource('enigmoData', {
         'type': 'geojson',
         'data': enigmoData,
@@ -137,7 +114,8 @@ class MapsCluster extends React.Component {
           'SnifferCards': ['+', ['case', SnifferCards, 1, 0]],
           'SnifferPromotions': ['+', ['case', SnifferPromotions, 1, 0]],
           'event': ['+', ['case', event, 1, 0]],
-          'locationsCards': ['+', ['case', locationsCards, 1, 0]],  
+          'locationsCards': ['+', ['case', locationsCards, 1, 0]],
+          'graffiti': ['+', ['case', graffiti, 1, 0]],  
         }
       });
 
@@ -152,19 +130,6 @@ class MapsCluster extends React.Component {
           "circle-radius": 12
         }
       })
-
-      // map.addLayer({
-      //   "id" : "layer-notCluster",
-      //   "type": "symbol",
-      //   'source': 'enigmoData',
-      //   "filter": ["!=", "cluster", true],
-      //   "layout": {
-      //       "text-field": ["string", ["get", "typeToElement"]],
-      //       "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-      //       "text-size": 10
-      //     },
-      //     "text-color" : "black"
-      // })
 
       map.on('data', (e) => {
         if (e.sourceId !== 'enigmoData' || !e.isSourceLoaded) return;
@@ -211,7 +176,6 @@ class MapsCluster extends React.Component {
                     }).setLngLat(coordinates);
                     break;
                   case "graffiti" : 
-                    console.log(props)
                     const elGraffiti = createGraffiti(props, "totals")
                     marker = markers[id] = new mapboxgl.Marker({
                       element: elGraffiti
@@ -240,8 +204,7 @@ class MapsCluster extends React.Component {
               }
           }
           else{  // if yes, get the cluster_id
-            console.log(props)
-
+            
             const id = props.cluster_id;
             // create a marker object with the cluster_id as a key
             let marker = markers[id];
@@ -256,6 +219,7 @@ class MapsCluster extends React.Component {
               }).setLngLat(coordinates);
               el.addEventListener('click', () => 
                 { 
+                    console.log("desde el cluster"+ props)
                     alert("Marker Clicked."+ props);
                 }
               );
@@ -342,18 +306,25 @@ class MapsCluster extends React.Component {
     }
 
     const createGraffiti = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
+      
+      var divContainer = document.createElement("div");
+      divContainer.style.width = "100px";
+      divContainer.style.height = "100px";
+      divContainer.style.overflow = 'hidden';
+      divContainer.style.borderRadius = "50%"
       var propsJson = JSON.parse(props.item)
-      div.style.backgroundImage = `url('${propsJson.idUser.pictureURL}')`;
-      div.style.backgroundSize = "cover"
-      console.log(div)
-      console.log(propsJson.idUser.pictureURLDescription)
-      // div.style.background = "Green";
-      // div.style.color = "white";
-      //div.innerHTML = props.typeToElement;
-      return div
+
+      ReactDOM.render(
+        React.createElement(
+          GraffitiMarker, {
+            pictureThumbnailURL : propsJson.idUser.pictureURL,
+            pictureURLDescription : propsJson.idUser.pictureURLDescription
+          }
+        ),
+        divContainer
+      );
+
+      return divContainer
     }
     
     const createOtro = (props, totals) => {
