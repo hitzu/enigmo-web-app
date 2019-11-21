@@ -1,8 +1,7 @@
 import React from 'react';
 import ProtectedRouteMap from './utils/ProtectedRouteMap.route'
-import { MapForMobile } from './containers/mapsForMobile'
-import { MapsCluster } from './containers/mapsCluster'
-import { MapWithJavaScript } from './containers/mapWithJavaScript'
+import { ClusterMap } from './containers/clusterMap'
+import { HeatMap } from './containers/heatMap'
 import { welcomeScreen } from './containers/welcomeScreen'
 import { Route, Switch } from 'react-router-dom'
 
@@ -12,9 +11,8 @@ const App = () => {
     <main>
       <Switch>
         <Route exact path = "/" component  = {welcomeScreen} />
-        <ProtectedRouteMap exact path = '/mapCluster/:lat?/:lng?' component = { MapsCluster } MapsCluster />
-        <ProtectedRouteMap exact path = '/mapForMobile/:lat?/:lng?' component = { MapForMobile } mapsForMobile />
-        <ProtectedRouteMap exact path = '/mapWithJavaScript/:lat?/:lng?' component = { MapWithJavaScript } MapWithJavaScript />
+        <ProtectedRouteMap exact path = '/clusterMap/:lat?/:lng?' component = { ClusterMap } ClusterMap />
+        <ProtectedRouteMap exact path = '/heatMap/:lat?/:lng?' component = { HeatMap } HeatMap />
         <Route path = "*" component = { () => "404 NOT FOUND"} ></Route>
       </Switch>
     </main>   

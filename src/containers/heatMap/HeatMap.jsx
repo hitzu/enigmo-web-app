@@ -7,7 +7,7 @@ import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.compon
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY
 
-class MapsCluster extends React.Component {
+class HeatMap extends React.Component {
 
   constructor(props) {
     super(props);
@@ -17,6 +17,12 @@ class MapsCluster extends React.Component {
       zoom: 4
     };
   }
+
+  // getGeoJsonFeature = (location,deltaLog,deltaLat)=>{
+  //   return {
+  //     "type": "Feature", "properties": { "id": Math.round(5000*Math.random()+1)+""+Date.now(), "mag": (5*Math.random()+1), "time": 1506794299451, "felt": null, "tsunami": 0 }, "geometry": { "type": "Point", "coordinates": [ location.lon+deltaLog,location.lat+deltaLat ] }
+  //   }
+  // }
 
   getGeoJsonFeature = (item, typeItem) => {
     let location = item.location.coordinates
@@ -53,13 +59,15 @@ class MapsCluster extends React.Component {
 
     map.addControl(new mapboxgl.NavigationControl());
  
-    const SnifferCards = ['==', ['get', 'typeToElement'], 'SnifferCards'];
-    const SnifferPromotions = ['==', ['get', 'typeToElement'], 'SnifferPromotions'];
-    const event = ['==', ['get', 'typeToElement'], 'event'];
-    const locationsCards = ['==', ['get', 'typeToElement'], 'locationsCards'];
-    const graffiti = ['==', ['get', 'typeToElement'], 'graffiti'];
+
     
     map.on('load', async  ()=> {
+
+      // const response = await axios.get('https://raw.githubusercontent.com/ivansabik/ubicajeros-api/master/cajeros.json');
+
+      // for (const item of response.data.cajeros) {
+      //   dataGeojson.features.push(this.getGeoJsonFeature(item,0,0))
+      // }
 
       const enigmoDataReceived = await axios({
       url : `http://192.168.10.149:3003/stamp/sniffer`,
@@ -105,31 +113,67 @@ class MapsCluster extends React.Component {
         enigmoData.features.push(this.getGeoJsonFeature(item, "locationsCards"))
       }
 
-      map.addSource('enigmoData', {
-        'type': 'geojson',
-        'data': enigmoData,
-        'cluster': true,
-        'clusterRadius': 80,
-        'clusterProperties': {
-          'SnifferCards': ['+', ['case', SnifferCards, 1, 0]],
-          'SnifferPromotions': ['+', ['case', SnifferPromotions, 1, 0]],
-          'event': ['+', ['case', event, 1, 0]],
-          'locationsCards': ['+', ['case', locationsCards, 1, 0]],
-          'graffiti': ['+', ['case', graffiti, 1, 0]],  
-        }
-      });
-
-      map.addLayer({
-        'id' : 'notCluster',
-        'type': 'circle',
-        'source': 'enigmoData',
-        "filter": ["!=", "cluster", true],
-        'paint' : {
-          "circle-color" : 'rgba(0,0,0,0)',
-          "circle-opacity": 0.6,
-          "circle-radius": 12
-        }
-      })
+        map.addSource('enigmoData', {
+            "type": "geojson",
+            "data": enigmoData
+        });
+        
+        map.addLayer({
+            "id": "enigmoData-heat",
+            "type": "heatmap",
+            "source": "enigmoData",
+            'layout': {
+                'visibility': 'visible'
+                },
+            "maxzoom":17,
+            "paint": {
+                // Increase the heatmap weight based on frequency and property magnitude
+                "heatmap-weight": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "mag"],
+                    0, 0,
+                    6, 1
+                ],
+                // Increase the heatmap color weight weight by zoom level
+                // heatmap-intensity is a multiplier on top of heatmap-weight
+                "heatmap-intensity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    0, 1,
+                    17, 3
+                ],
+                // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
+                // Begin color ramp at 0-stop with a 0-transparancy color
+                // to create a blur-like effect.
+                "heatmap-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["heatmap-density"],
+                    0, "rgba(33,102,172,0)",
+                    0.3, "blue",
+                    0.7, "yellow",
+                    1, "red"
+                    ],
+                    // Adjust the heatmap radius by zoom level
+                    "heatmap-radius": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    0, 2,
+                    9, 20
+                ],
+                // Transition from heatmap to circle layer by zoom level
+                "heatmap-opacity": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    7, 1,
+                    17, 0
+                ],
+            }
+        }, 'waterway-label');
 
       map.on('data', (e) => {
         if (e.sourceId !== 'enigmoData' || !e.isSourceLoaded) return;
@@ -144,7 +188,8 @@ class MapsCluster extends React.Component {
       let totals;
 
       const updateMarkers = () => {
-
+        console.log("entro a actualizar lsop markers")
+        if (map.getZoom() < 5) return
         // keep track of new markers
         let newMarkers = {};
         // get the features whether or not they are visible (https://docs.mapbox.com/mapbox-gl-js/api/#map#queryrenderedfeatures)
@@ -176,6 +221,7 @@ class MapsCluster extends React.Component {
                     }).setLngLat(coordinates);
                     break;
                   case "graffiti" : 
+                    console.log(props)
                     const elGraffiti = createGraffiti(props, "totals")
                     marker = markers[id] = new mapboxgl.Marker({
                       element: elGraffiti
@@ -204,7 +250,8 @@ class MapsCluster extends React.Component {
               }
           }
           else{  // if yes, get the cluster_id
-            
+            console.log(props)
+
             const id = props.cluster_id;
             // create a marker object with the cluster_id as a key
             let marker = markers[id];
@@ -219,7 +266,6 @@ class MapsCluster extends React.Component {
               }).setLngLat(coordinates);
               el.addEventListener('click', () => 
                 { 
-                    console.log("desde el cluster"+ props)
                     alert("Marker Clicked."+ props);
                 }
               );
@@ -351,4 +397,6 @@ class MapsCluster extends React.Component {
     );
   }
 }
- export {MapsCluster}
+
+export {HeatMap}
+
