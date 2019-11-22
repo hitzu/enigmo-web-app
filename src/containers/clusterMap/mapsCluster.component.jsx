@@ -145,6 +145,12 @@ class ClusterMap extends React.Component {
 
       const updateMarkers = () => {
 
+        this.setState({
+          lng: map.getCenter().lng,
+          lat: map.getCenter().lat,
+          zoom: map.getZoom()
+        })
+
         // keep track of new markers
         let newMarkers = {};
         // get the features whether or not they are visible (https://docs.mapbox.com/mapbox-gl-js/api/#map#queryrenderedfeatures)

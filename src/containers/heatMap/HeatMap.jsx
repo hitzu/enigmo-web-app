@@ -18,12 +18,6 @@ class HeatMap extends React.Component {
     };
   }
 
-  // getGeoJsonFeature = (location,deltaLog,deltaLat)=>{
-  //   return {
-  //     "type": "Feature", "properties": { "id": Math.round(5000*Math.random()+1)+""+Date.now(), "mag": (5*Math.random()+1), "time": 1506794299451, "felt": null, "tsunami": 0 }, "geometry": { "type": "Point", "coordinates": [ location.lon+deltaLog,location.lat+deltaLat ] }
-  //   }
-  // }
-
   getGeoJsonFeature = (item, typeItem) => {
     let location = item.location.coordinates
     return {
@@ -63,12 +57,6 @@ class HeatMap extends React.Component {
     
     map.on('load', async  ()=> {
 
-      // const response = await axios.get('https://raw.githubusercontent.com/ivansabik/ubicajeros-api/master/cajeros.json');
-
-      // for (const item of response.data.cajeros) {
-      //   dataGeojson.features.push(this.getGeoJsonFeature(item,0,0))
-      // }
-
       const enigmoDataReceived = await axios({
       url : `http://192.168.10.149:3003/stamp/sniffer`,
       method : 'POST',
@@ -90,8 +78,6 @@ class HeatMap extends React.Component {
             "longitude":-98.2190501
             }
       })
-
-      console.log(enigmoGraffitiReceived)
 
       for (const item of enigmoGraffitiReceived.data.graffiti) {
         enigmoData.features.push(this.getGeoJsonFeature(item, "graffiti"))
@@ -188,7 +174,12 @@ class HeatMap extends React.Component {
       let totals;
 
       const updateMarkers = () => {
-        console.log("entro a actualizar lsop markers")
+        this.setState({
+          lng: map.getCenter().lng,
+          lat: map.getCenter().lat,
+          zoom: map.getZoom()
+        })
+
         if (map.getZoom() < 5) return
         // keep track of new markers
         let newMarkers = {};
@@ -249,36 +240,6 @@ class HeatMap extends React.Component {
                 marker.addTo(map);
               }
           }
-          else{  // if yes, get the cluster_id
-            console.log(props)
-
-            const id = props.cluster_id;
-            // create a marker object with the cluster_id as a key
-            let marker = markers[id];
-            // if that marker doesn't exist yet, create it
-            if (!marker) {
-              totals = getPointCount(features);
-              // create an html element (more on this later)
-              const el = createClusterChido(props, totals);
-              // create the marker object passing the html element and the coordinates
-              marker = markers[id] = new mapboxgl.Marker({
-                element: el
-              }).setLngLat(coordinates);
-              el.addEventListener('click', () => 
-                { 
-                    alert("Marker Clicked."+ props);
-                }
-              );
-            }
-            
-            // create an object in our newMarkers object with our current marker representing the current cluster
-            newMarkers[id] = marker;
-            
-            // if the marker isn't already on screen then add it to the map
-            if (!markersOnScreen[id]) {
-              marker.addTo(map);
-            }
-          }
         });
         
         // check if the marker with the cluster_id is already on the screen by iterating through our markersOnScreen object, which keeps track of that
@@ -301,35 +262,6 @@ class HeatMap extends React.Component {
         return point_counts;
       };
     });
-
-    const createClusterChido = (props, totals) => {
-      var div = document.createElement("div");
-      var colorBackground = "rgba(0,0,0,0)"
-
-      if ( props.point_count_abbreviated <= 15 ){
-        colorBackground = "rgba(4,36,166,0.75)"
-      }
-      else if(props.point_count_abbreviated > 15 && props.point_count_abbreviated <= 25){
-        colorBackground = "rgba(144,206,231,0.75)"
-      }
-      else if(props.point_count_abbreviated > 25 && props.point_count_abbreviated <= 35){
-        colorBackground = "rgba(251,172,1,0.75)"
-      }
-      else{
-        colorBackground = "rgba(244,47,1,0.75)"
-      }
-
-      div.style.width = "40px";
-      div.style.height = "40px";
-      div.style.borderRadius = "20px"
-      div.style.borderWidth = "thin"
-      div.style.backgroundColor = colorBackground
-      div.style.borderColor = "white"
-      div.style.textAlign = "center"
-      div.style.color = "white";
-      div.innerHTML = props.point_count_abbreviated;
-      return div
-    }
 
     const createLocationCard = (props, totals) => {
       var div = document.createElement("div");
