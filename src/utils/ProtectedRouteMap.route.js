@@ -5,11 +5,13 @@ const ProtectedRouteMap = ( {component : Component, ...rest} ) => {
     return (
         <Route {...rest} render = {
             (props) => {
-                //if(auth.isAuthenticated()){
-                if (true) {
+                console.log("jajatls",props.match.params.token)
+                if( props.match.params.token ){
+                // if (true) {
                     console.log("jajajaja xD")
                     return <Component {...props} />
                 } else {
+                    console.log("so sad")
                     return (
                         <Redirect to = {
                             {

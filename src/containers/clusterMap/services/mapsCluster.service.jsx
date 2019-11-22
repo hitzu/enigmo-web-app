@@ -4,6 +4,7 @@ const baseURl = process.env.REACT_APP_BASE_URL
 
 async function getMapData(lat, lng) {
     try {
+        console.log("entro al mapsClusterService")
             // const response = await axios({
             // url : `localhost:3003/stamp/sniffer`,
             // method : 'POST',
