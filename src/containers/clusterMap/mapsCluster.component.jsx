@@ -120,16 +120,36 @@ class ClusterMap extends React.Component {
       });
 
       map.addLayer({
-        'id' : 'notCluster',
+        'id' : 'clusters',
         'type': 'circle',
         'source': 'enigmoData',
-        "filter": ["!=", "cluster", true],
+        "filter": ["==", "cluster", true],
         'paint' : {
           "circle-color" : 'rgba(0,0,0,0)',
           "circle-opacity": 0.6,
           "circle-radius": 12
         }
       })
+
+      map.on('click', 'clusters', function (e) {
+        
+        var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        var clusterId = features[0].properties.cluster_id;
+        map.getSource('enigmoData').getClusterExpansionZoom(clusterId, function (err, zoom) {
+          if (err)
+            return;
+          map.easeTo({
+            center: features[0].geometry.coordinates,
+            zoom: zoom,
+            duration:200
+          });
+
+          setTimeout(() => {
+            updateMarkers()
+            
+          }, 200);
+        });
+      });
 
       map.on('data', (e) => {
         if (e.sourceId !== 'enigmoData' || !e.isSourceLoaded) return;
@@ -223,12 +243,12 @@ class ClusterMap extends React.Component {
               marker = markers[id] = new mapboxgl.Marker({
                 element: el
               }).setLngLat(coordinates);
-              el.addEventListener('click', () => 
-                { 
-                    console.log("desde el cluster"+ props)
-                    alert("Marker Clicked."+ props);
-                }
-              );
+              // el.addEventListener('click', () => 
+              //   { 
+              //       console.log("desde el cluster"+ props)
+              //       alert("Marker Clicked."+ props);
+              //   }
+              // );
             }
             
             // create an object in our newMarkers object with our current marker representing the current cluster
