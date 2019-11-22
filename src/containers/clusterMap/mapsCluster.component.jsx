@@ -48,10 +48,10 @@ class ClusterMap extends React.Component {
     let payload = jwt.verify(token,process.env.REACT_APP_SECRET_KEY)
     console.log(payload);
     
-    const socket = socketIOClient(this.state.endpoint);
+    const socket = socketIOClient(this.endpoint);
 
     socket.emit("subscribe",payload.UIID)
-    socket.on("")
+    // socket.on("")
 
 
     const { lng, lat, zoom } = this.state;
