@@ -2,7 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
-
+import socketIOClient from "socket.io-client";
+import jwt from "jsonwebtoken";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_KEY
 
@@ -13,7 +14,9 @@ class MapsCluster extends React.Component {
     this.state = {
       lng: 5,
       lat: 34,
-      zoom: 1.5
+      zoom: 1.5,
+      response:0,
+      endpoint:"http://localhost:3004/mapActions"
     };
   }
 
@@ -24,13 +27,19 @@ class MapsCluster extends React.Component {
   }
 
   componentDidMount() {
-
     var dataGeojson = {
       "type": "FeatureCollection",
       "features": []
     };
 
+    let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVSUlEIjoiRVNUT0VTVU5VSUlEX1hEUFVUT1MiLCJpYXQiOjE1NzQ0NDE1MzgsImp0aSI6IjMxOTRhYmZmLTdkMTEtNDQxOS05OTU4LTRiMWM1ZTY1NTUxYSIsImV4cCI6MTU3NDQ0OTE3N30.t76Ob0zBfZrrcaIjXxS72dfarwmPA2gkrDhK6SE8EjM"
+    let payload = jwt.verify(token,process.env.REACT_APP_SECRET_KEY)
+    console.log(payload);
+    
+    const socket = socketIOClient(this.state.endpoint);
 
+    socket.emit("subscribe",payload.UIID)
+    socket.on("")
     const { lng, lat, zoom } = this.state;
 
     const map = new mapboxgl.Map({
@@ -39,6 +48,8 @@ class MapsCluster extends React.Component {
       center: [lng, lat],
       zoom
     });
+
+    
 
     map.addControl(new mapboxgl.NavigationControl());
  
@@ -77,7 +88,6 @@ class MapsCluster extends React.Component {
       }
       
 
-      console.log("termineee.------");
       
       // add a clustered GeoJSON source for a sample set of earthquakes
       map.addSource('earthquakes', {
@@ -158,8 +168,12 @@ class MapsCluster extends React.Component {
             return;
           map.easeTo({
             center: features[0].geometry.coordinates,
-            zoom: zoom
+            zoom: zoom,
+            duration:200
           });
+          setTimeout(() => {
+            updateMarkers("easeTo")
+          }, 600);
         });
       });
       
@@ -178,12 +192,13 @@ class MapsCluster extends React.Component {
         if (e.sourceId !== 'earthquakes' || !e.isSourceLoaded) return;
         
         map.on('move', ()=>{
-          // updateMarkers("move")
+          updateMarkers("move")
         });
         map.on('moveend', ()=>{
-          updateMarkers("moveend")
+          // updateMarkers("moveend")
+          
         });
-        // updateMarkers();
+        updateMarkers();
       });
     });
 
