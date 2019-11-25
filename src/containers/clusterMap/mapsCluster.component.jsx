@@ -35,6 +35,7 @@ class ClusterMap extends React.Component {
   markerUserLocation;
 
   emitOpenGraffiti = (idGraffiti)=>{
+    console.log("jajajaja abrieron graffiti")
     this.socket.emit("open/Graffiti",{UIID:this.UIID, idGraffiti:idGraffiti})
   }
   emitOpenEvent = (idEvent)=>{
@@ -84,12 +85,12 @@ class ClusterMap extends React.Component {
                 marker = this.markers[id] = new mapboxgl.Marker({
                   element: elGraffiti
                 }).setLngLat(coordinates);
-                elGraffiti.addEventListener('click', () => 
-                  { 
-                      alert("Marker Clicked."+ props.id);
-                      this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
-                  }
-                );
+                // elGraffiti.addEventListener('click', () => 
+                //   { 
+                //       alert("Marker Clicked."+ props.id);
+                //       this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
+                //   }
+                // );
                 break;
               default :
                 const elOtro = this.createOtro(props, "totals")
@@ -172,10 +173,16 @@ class ClusterMap extends React.Component {
       "type": "FeatureCollection",
       "features": []
     };
-    // let payload = jwt.verify(this.token,process.env.REACT_APP_SECRET_KEY)
+    let payload = jwt.verify(this.token,process.env.REACT_APP_SECRET_KEY)
     // console.log(payload);
     
     this.UIID = payload.UIID
+
+    this.socket.on("open/Graffiti",content =>{
+      console.log("miguel es puto again", content)
+      // this.markerUserLocation.setLngLat([content.lng,content.lat])
+    })
+
     this.socket.on("update/userLocation",content =>{
       this.markerUserLocation.setLngLat([content.lng,content.lat])
     })
@@ -402,7 +409,8 @@ class ClusterMap extends React.Component {
       ReactDOM.render(
         React.createElement(
           GraffitiMarker, {
-            graffiti : propsJson
+            graffiti : propsJson,
+            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)}
           }
         ),
         divContainer

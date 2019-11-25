@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TextGraffitiPreview, ImageGraffitiPreview, VideoGraffitiPreview } from './graffitiPreviewComponents'
+import { TextGraffitiPreview, ImageGraffitiPreview, VideoGraffitiPreview, AudioGraffitiPreview } from './graffitiPreviewComponents'
 import { CustomPositionUserPicture } from '../userComponents'
 
 export default class GraffitiMarker extends React.Component {
@@ -32,7 +32,6 @@ export default class GraffitiMarker extends React.Component {
                         <TextGraffitiPreview graffitiText = {graffiti.interaction.description}></TextGraffitiPreview>
                     </div>
                 )
-            break;
             case "video" : 
                 console.log("video jajajaja ;C trueno", graffiti)
                 return (
@@ -50,9 +49,21 @@ export default class GraffitiMarker extends React.Component {
                         </VideoGraffitiPreview>
                     </div>
                 )
-            break;
             case "audio" :
-            break;
+                    return (
+                        <div style = {{
+                            marginTop : "10px",
+                            width : "500px",
+                            height : "200px",
+                            margin : "0 auto",
+                            textAlign : "center",
+                            backgroundColor : "red"
+                        }}>
+                            <AudioGraffitiPreview 
+                                graffitiAudio = { graffiti.interaction.mediaUrl } 
+                            ></AudioGraffitiPreview>
+                        </div>
+                    )
             case "image" :
                 return (
                     <div style = {{
@@ -69,18 +80,19 @@ export default class GraffitiMarker extends React.Component {
                         ></ImageGraffitiPreview>
                     </div>
                 )
-            break;
         }
+    }
+
+    selectGraffiti = () => { 
+        this.setState( (state) => {
+            return { isSelected : !state.isSelected } 
+        })
     }
 
     render(){
 
-        const { graffiti } = this.props;
-        console.log(this.props.graffiti)
-        
-
+        const { graffiti, emitOpenGraffiti } = this.props;
         const { isSelected } = this.state;
-        console.log(isSelected)
 
         return(
             <div
@@ -96,7 +108,9 @@ export default class GraffitiMarker extends React.Component {
                         <div style = {{
                             height:'100%', 
                             width:'100%',
-                        }}> 
+                        }}
+                        onClick={emitOpenGraffiti}
+                        > 
 
                             {this.getGraffitiContent(graffiti)}
                             
@@ -127,7 +141,10 @@ export default class GraffitiMarker extends React.Component {
                             left: "50%",
                             top: "50%",
                             transform: "translate(-50%, -50%)"
-                        }}> 
+                        }}
+                        
+                        onClick={this.selectGraffiti}
+                        > 
                             <CustomPositionUserPicture 
                                 pictureURL = {graffiti.idUser.pictureURL} 
                                 pictureURLDescription = {graffiti.idUser.pictureURLDescription}>
