@@ -21,9 +21,123 @@ class ClusterMap extends React.Component {
       lat: props.match.params.lat,
       zoom: 4
     };
+    this.token = props.match.params.token
+    this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
+    this.socket = socketIOClient(this.endpoint);
+    this.UIID = "none"
   }
 
-  endpoint = "http://localhost:3004/mapActions"
+
+  markers = {};
+  markersOnScreen = {}; 
+  point_counts = [];
+  totals;
+
+  updateMarkers = () => {
+    // keep track of new markers
+    let newMarkers = {};
+    // get the features whether or not they are visible (https://docs.mapbox.com/mapbox-gl-js/api/#map#queryrenderedfeatures)
+    const features = this.map.querySourceFeatures('enigmoData');
+    // loop through each feature
+    features.forEach((feature) => {
+      const coordinates = feature.geometry.coordinates;
+      // get our properties, which include our clustered properties
+      const props = feature.properties;
+      // continue only if the point is part of a cluster
+      if (!props.cluster) {
+          const id = props.id
+          let marker = this.markers[id];
+          if (!marker){
+            this.totals = this.getPointCount(features);
+            // create an html element (more on this later)
+            
+            switch (props.typeToElement ){
+              case "locationsCards" :
+                const elLocation = this.createLocationCard(props, "totals");
+                marker = this.markers[id] = new mapboxgl.Marker({
+                  element: elLocation
+                }).setLngLat(coordinates);
+                break;
+              case "SnifferCards" : 
+                const elSnifferCard = this.createSnifferCard(props, "totals")
+                marker = this.markers[id] = new mapboxgl.Marker({
+                  element: elSnifferCard
+                }).setLngLat(coordinates);
+                break;
+              case "graffiti" : 
+                const elGraffiti = this.createGraffiti(props, "totals")
+                marker = this.markers[id] = new mapboxgl.Marker({
+                  element: elGraffiti
+                }).setLngLat(coordinates);
+                elGraffiti.addEventListener('click', () => 
+                  { 
+                      alert("Marker Clicked."+ props.id);
+                      this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
+                  }
+                );
+                break;
+              default :
+                const elOtro = this.createOtro(props, "totals")
+                marker = this.markers[id] = new mapboxgl.Marker({
+                  element: elOtro
+                }).setLngLat(coordinates);
+                break;
+            }
+            // create the marker object passing the html element and the coordinates
+            
+          }
+          // create an object in our newMarkers object with our current marker representing the current cluster
+          newMarkers[id] = marker;
+
+          if (!this.markersOnScreen[id]) {
+            marker.addTo(this.map);
+          }
+      }
+      else{  // if yes, get the cluster_id
+        
+        const id = props.cluster_id;
+        // create a marker object with the cluster_id as a key
+        let marker = this.markers[id];
+        // if that marker doesn't exist yet, create it
+        if (!marker) {
+          this.totals = this.getPointCount(features);
+          // create an html element (more on this later)
+          const el = this.createClusterChido(props, this.totals);
+          // create the marker object passing the html element and the coordinates
+          marker = this.markers[id] = new mapboxgl.Marker({
+            element: el
+          }).setLngLat(coordinates);
+          // el.addEventListener('click', () => 
+          //   { 
+          //       console.log("desde el cluster"+ props)
+          //       alert("Marker Clicked."+ props);
+          //   }
+          // );
+        }
+        
+        // create an object in our newMarkers object with our current marker representing the current cluster
+        newMarkers[id] = marker;
+        
+        // if the marker isn't already on screen then add it to the map
+        if (!this.markersOnScreen[id]) {
+          marker.addTo(this.map);
+        }
+      }
+    });
+    
+    // check if the marker with the cluster_id is already on the screen by iterating through our markersOnScreen object, which keeps track of that
+    for (var id in this.markersOnScreen) {
+      // if there isn't a new marker with that id, then it's not visible, therefore remove it. 
+      if (!newMarkers[id]) {
+        this.markersOnScreen[id].remove();
+      }
+    }
+    // otherwise, it is visible and we need to add it to our markersOnScreen object
+      this.markersOnScreen = newMarkers;
+  };
+
+
+  markerUserLocation;
 
   getGeoJsonFeature = (item, typeItem) => {
     let location = item.location.coordinates
@@ -47,29 +161,36 @@ class ClusterMap extends React.Component {
       "type": "FeatureCollection",
       "features": []
     };
-
-
-    
-    // let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVSUlEIjoiRVNUT0VTVU5VSUlEX1hEUFVUT1MiLCJpYXQiOjE1NzQ0NDE1MzgsImp0aSI6IjMxOTRhYmZmLTdkMTEtNDQxOS05OTU4LTRiMWM1ZTY1NTUxYSIsImV4cCI6MTU3NDQ0OTE3N30.t76Ob0zBfZrrcaIjXxS72dfarwmPA2gkrDhK6SE8EjM"
-    // let payload = jwt.verify(token,process.env.REACT_APP_SECRET_KEY)
+    // let payload = jwt.verify(this.token,process.env.REACT_APP_SECRET_KEY)
     // console.log(payload);
     
-    // const socket = socketIOClient(this.endpoint);
+    // this.UIID = payload.UIID
+    // this.socket.on("update/userLocation",content =>{
+    //   this.markerUserLocation.setLngLat([content.lng,content.lat])
+    // })
+    // this.socket.on("flyTo",content =>{
+    //   this.map.flyTo({
+    //     center: content.center,
+    //     zoom: content.zoom,duration:200
+    //   })
+    //   setTimeout(() => {
+    //     this.updateMarkers()
+        
+    //   }, 500);
+    // })
 
-    // socket.emit("subscribe",payload.UIID)
-    // // socket.on("")
-
+    this.socket.emit("subscribe",this.UIID)
 
     const { lng, lat, zoom } = this.state;
 
-    const map = new mapboxgl.Map({
+    this.map = new mapboxgl.Map({
       container: this.mapContainer,
       style: 'mapbox://styles/mapbox/streets-v9',
       center: [lng, lat],
       zoom
     });
 
-    map.addControl(new mapboxgl.NavigationControl());
+    this.map.addControl(new mapboxgl.NavigationControl());
  
     const SnifferCards = ['==', ['get', 'typeToElement'], 'SnifferCards'];
     const SnifferPromotions = ['==', ['get', 'typeToElement'], 'SnifferPromotions'];
@@ -77,7 +198,11 @@ class ClusterMap extends React.Component {
     const locationsCards = ['==', ['get', 'typeToElement'], 'locationsCards'];
     const graffiti = ['==', ['get', 'typeToElement'], 'graffiti'];
     
-    map.on('load', async  ()=> {
+    this.map.on('load', async  ()=> {
+      this.markerUserLocation = new mapboxgl.Marker({
+        element: this.createUserLocation("locationUser",1)
+      }).setLngLat([this.state.lng,this.state.lat]);
+      this.markerUserLocation.addTo(this.map)
 
       const enigmoDataReceived = await axios({
       url : `http://192.168.10.149:3003/stamp/sniffer`,
@@ -123,7 +248,7 @@ class ClusterMap extends React.Component {
         enigmoData.features.push(this.getGeoJsonFeature(item, "locationsCards"))
       }
 
-      map.addSource('enigmoData', {
+      this.map.addSource('enigmoData', {
         'type': 'geojson',
         'data': enigmoData,
         'cluster': true,
@@ -137,7 +262,7 @@ class ClusterMap extends React.Component {
         }
       });
 
-      map.addLayer({
+      this.map.addLayer({
         'id' : 'clusters',
         'type': 'circle',
         'source': 'enigmoData',
@@ -149,158 +274,56 @@ class ClusterMap extends React.Component {
         }
       })
 
-      map.on('click', 'clusters', function (e) {
+      this.map.on('click', 'clusters',  (e) =>{
         
-        var features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
+        var features = this.map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
         var clusterId = features[0].properties.cluster_id;
-        map.getSource('enigmoData').getClusterExpansionZoom(clusterId, function (err, zoom) {
+        this.map.getSource('enigmoData').getClusterExpansionZoom(clusterId,  (err, zoom) =>{
           if (err)
             return;
-          map.easeTo({
+          this.map.easeTo({
             center: features[0].geometry.coordinates,
             zoom: zoom,
             duration:200
           });
-
+          this.socket.emit("flyTo",{UIID:this.UIID,center:features[0].geometry.coordinates,zoom:zoom})
           setTimeout(() => {
-            updateMarkers()
+            this.updateMarkers()
             
-          }, 200);
+          }, 500);
         });
       });
 
-      map.on('data', (e) => {
+      this.map.on('data', (e) => {
         if (e.sourceId !== 'enigmoData' || !e.isSourceLoaded) return;
-        map.on('move', updateMarkers);
-        map.on('moveend', updateMarkers);
-        updateMarkers();
+        this.map.on('move', ()=>{
+          this.setState({
+            lng: this.map.getCenter().lng,
+            lat: this.map.getCenter().lat,
+            zoom: this.map.getZoom()
+          })
+          console.log("chasssss");
+          
+          this.socket.emit("update/userLocation",{UIID:this.UIID,lat:this.state.lat,lng:this.state.lng})
+          this.updateMarkers()
+        });
+        this.map.on('moveend', this.updateMarkers);
+        this.updateMarkers();
       });
 
-      let markers = {};
-      let markersOnScreen = {}; 
-      let point_counts = [];
-      let totals;
+      
 
-      const updateMarkers = () => {
-
-        this.setState({
-          lng: map.getCenter().lng,
-          lat: map.getCenter().lat,
-          zoom: map.getZoom()
-        })
-
-        // keep track of new markers
-        let newMarkers = {};
-        // get the features whether or not they are visible (https://docs.mapbox.com/mapbox-gl-js/api/#map#queryrenderedfeatures)
-        const features = map.querySourceFeatures('enigmoData');
-        // loop through each feature
-        features.forEach((feature) => {
-          const coordinates = feature.geometry.coordinates;
-          // get our properties, which include our clustered properties
-          const props = feature.properties;
-          // continue only if the point is part of a cluster
-          if (!props.cluster) {
-              const id = props.id
-              let marker = markers[id];
-              if (!marker){
-                totals = getPointCount(features);
-                // create an html element (more on this later)
-                
-                switch (props.typeToElement ){
-                  case "locationsCards" :
-                    const elLocation = createLocationCard(props, "totals");
-                    marker = markers[id] = new mapboxgl.Marker({
-                      element: elLocation
-                    }).setLngLat(coordinates);
-                    break;
-                  case "SnifferCards" : 
-                    const elSnifferCard = createSnifferCard(props, "totals")
-                    marker = markers[id] = new mapboxgl.Marker({
-                      element: elSnifferCard
-                    }).setLngLat(coordinates);
-                    break;
-                  case "graffiti" : 
-                    const elGraffiti = createGraffiti(props, "totals")
-                    marker = markers[id] = new mapboxgl.Marker({
-                      element: elGraffiti
-                    }).setLngLat(coordinates);
-                    elGraffiti.addEventListener('click', () => 
-                      { 
-                          alert("Marker Clicked."+ props.id);
-                      }
-                    );
-                    break;
-                  default :
-                    const elOtro = createOtro(props, "totals")
-                    marker = markers[id] = new mapboxgl.Marker({
-                      element: elOtro
-                    }).setLngLat(coordinates);
-                    break;
-                }
-                // create the marker object passing the html element and the coordinates
-                
-              }
-              // create an object in our newMarkers object with our current marker representing the current cluster
-              newMarkers[id] = marker;
-
-              if (!markersOnScreen[id]) {
-                marker.addTo(map);
-              }
-          }
-          else{  // if yes, get the cluster_id
-            
-            const id = props.cluster_id;
-            // create a marker object with the cluster_id as a key
-            let marker = markers[id];
-            // if that marker doesn't exist yet, create it
-            if (!marker) {
-              totals = getPointCount(features);
-              // create an html element (more on this later)
-              const el = createClusterChido(props, totals);
-              // create the marker object passing the html element and the coordinates
-              marker = markers[id] = new mapboxgl.Marker({
-                element: el
-              }).setLngLat(coordinates);
-              // el.addEventListener('click', () => 
-              //   { 
-              //       console.log("desde el cluster"+ props)
-              //       alert("Marker Clicked."+ props);
-              //   }
-              // );
-            }
-            
-            // create an object in our newMarkers object with our current marker representing the current cluster
-            newMarkers[id] = marker;
-            
-            // if the marker isn't already on screen then add it to the map
-            if (!markersOnScreen[id]) {
-              marker.addTo(map);
-            }
-          }
-        });
-        
-        // check if the marker with the cluster_id is already on the screen by iterating through our markersOnScreen object, which keeps track of that
-        for (var id in markersOnScreen) {
-          // if there isn't a new marker with that id, then it's not visible, therefore remove it. 
-          if (!newMarkers[id]) {
-            markersOnScreen[id].remove();
-          }
-        }
-        // otherwise, it is visible and we need to add it to our markersOnScreen object
-          markersOnScreen = newMarkers;
-      };
-
-      const getPointCount = (features) => {
+      this.getPointCount = (features) => {
         features.forEach(f => {
           if (f.properties.cluster) {
-            point_counts.push(f.properties.point_count)
+            this.point_counts.push(f.properties.point_count)
           }
         })
-        return point_counts;
+        return this.point_counts;
       };
     });
 
-    const createClusterChido = (props, totals) => {
+    this.createClusterChido = (props, totals) => {
       var div = document.createElement("div");
       var colorBackground = "rgba(0,0,0,0)"
 
@@ -329,7 +352,7 @@ class ClusterMap extends React.Component {
       return div
     }
 
-    const createLocationCard = (props, totals) => {
+    this.createLocationCard = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "100px";
       div.style.height = "100px";
@@ -338,8 +361,18 @@ class ClusterMap extends React.Component {
       div.innerHTML = props.typeToElement;
       return div
     }
+    this.createUserLocation = (props, totals) => {
+      var div = document.createElement("div");
+      div.style.width = "30px";
+      div.style.height = "30px";
+      div.style.background = "yellow";
+      div.style.borderRadius = "50%";
+      div.style.color = "green";
+      div.innerHTML = props;
+      return div
+    }
 
-    const createSnifferCard = (props, totals) => {
+    this.createSnifferCard = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "100px";
       div.style.height = "100px";
@@ -349,21 +382,16 @@ class ClusterMap extends React.Component {
       return div
     }
 
-    const createGraffiti = (props, totals) => {
+    this.createGraffiti = (props, totals) => {
       
       var divContainer = document.createElement("div");
-      divContainer.style.width = "100px";
-      divContainer.style.height = "100px";
-      divContainer.style.overflow = 'hidden';
-      divContainer.style.borderRadius = "50%"
+      divContainer.style.display = "inline-block"
       var propsJson = JSON.parse(props.item)
 
       ReactDOM.render(
         React.createElement(
           GraffitiMarker, {
-            graffiti : propsJson,
-            pictureThumbnailURL : propsJson.idUser.pictureURL,
-            pictureURLDescription : propsJson.idUser.pictureURLDescription
+            graffiti : propsJson
           }
         ),
         divContainer
@@ -372,7 +400,7 @@ class ClusterMap extends React.Component {
       return divContainer
     }
     
-    const createOtro = (props, totals) => {
+    this.createOtro = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "100px";
       div.style.height = "100px";
