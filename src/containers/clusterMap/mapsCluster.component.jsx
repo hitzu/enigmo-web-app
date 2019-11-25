@@ -2,7 +2,11 @@ import React from 'react'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
 import ReactDOM from 'react-dom'
+import EventMarker from '../../components/mapComponents/EventMarker.component'
 import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.component'
+import LocationCardMarker from '../../components/mapComponents/LocationCardMarker.component'
+import SnifferCardMarker from '../../components/mapComponents/SnifferCardMarker.component'
+import SnifferPromotionMarker from '../../components/mapComponents/SnifferPromotionMarker.component'
 import socketIOClient from "socket.io-client";
 import jwt from "jsonwebtoken";
 
@@ -44,14 +48,16 @@ class ClusterMap extends React.Component {
       "features": []
     };
 
-    let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVSUlEIjoiRVNUT0VTVU5VSUlEX1hEUFVUT1MiLCJpYXQiOjE1NzQ0NDE1MzgsImp0aSI6IjMxOTRhYmZmLTdkMTEtNDQxOS05OTU4LTRiMWM1ZTY1NTUxYSIsImV4cCI6MTU3NDQ0OTE3N30.t76Ob0zBfZrrcaIjXxS72dfarwmPA2gkrDhK6SE8EjM"
-    let payload = jwt.verify(token,process.env.REACT_APP_SECRET_KEY)
-    console.log(payload);
-    
-    const socket = socketIOClient(this.endpoint);
 
-    socket.emit("subscribe",payload.UIID)
-    // socket.on("")
+    
+    // let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVSUlEIjoiRVNUT0VTVU5VSUlEX1hEUFVUT1MiLCJpYXQiOjE1NzQ0NDE1MzgsImp0aSI6IjMxOTRhYmZmLTdkMTEtNDQxOS05OTU4LTRiMWM1ZTY1NTUxYSIsImV4cCI6MTU3NDQ0OTE3N30.t76Ob0zBfZrrcaIjXxS72dfarwmPA2gkrDhK6SE8EjM"
+    // let payload = jwt.verify(token,process.env.REACT_APP_SECRET_KEY)
+    // console.log(payload);
+    
+    // const socket = socketIOClient(this.endpoint);
+
+    // socket.emit("subscribe",payload.UIID)
+    // // socket.on("")
 
 
     const { lng, lat, zoom } = this.state;
@@ -355,6 +361,7 @@ class ClusterMap extends React.Component {
       ReactDOM.render(
         React.createElement(
           GraffitiMarker, {
+            graffiti : propsJson,
             pictureThumbnailURL : propsJson.idUser.pictureURL,
             pictureURLDescription : propsJson.idUser.pictureURLDescription
           }

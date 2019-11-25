@@ -4,58 +4,53 @@ import PropTypes from 'prop-types'
 export default class GraffitiMarker extends React.Component {
 
     static propTypes = {
+        graffiti : PropTypes.object.isRequired,
         pictureThumbnailURL: PropTypes.string.isRequired,
         pictureURLDescription : PropTypes.object.isRequired
-      };
+    };
+    
+    constructor(props) {
+        super(props);
+        this.state = {
+            isSelected : false
+        };
+    }
 
-    render(){
-
-        const { pictureThumbnailURL, pictureURLDescription } = this.props;
-        console.log(this.props)
-
-        return(
-            <div style = 
-                {{ 
-                    backgroundImage: `url(${pictureThumbnailURL})`, 
-                    backgroundSize : 'cover',
-                    height:'100px', 
-                    width:'100px',
-                    transform : 
-                        `translate(calc(${(pictureURLDescription.posX / 2) * 100}px - 50%), calc(${(pictureURLDescription.posY / 2) * 100}px - 50%))
-                        scale(${pictureURLDescription.scale})
-                        rotate(${pictureURLDescription.rotation}rad)
-                        `
-                }}>
+    getGraffitiContent(){
+        return (
+            <div>
+                jajaja esto retorno :C
             </div>
         )
     }
-}
 
+    
 
-// import React, { useState, useEffect } from 'react'
+    render(){
 
-// const GraffitiMarker = (props) => {
-
-//     const [pictureThumbnailURL, setPictureThumbnailURL] = useState(props.pictureThumbnailURL)
-//     const [pictureURLDescription, setPictureURLDescription] = ({
-//         bgColor : "",
-//         posX : 1,
-//         posY : 1,
-//         rotation : 0,
-//         scale : 1
-//     }) 
-
-//     useEffect( () => {
-//         console.log(pictureThumbnailURL)
-//         console.log(pictureURLDescription)
-//     })
-
-//     return (
+        const { graffiti, pictureThumbnailURL, pictureURLDescription } = this.props;
+        console.log(this.props.graffiti)
         
-//         <h1>{pictureThumbnailURL
-//             }</h1>
-//     )
 
-// }
+        const { isSelected } = this.state;
+        console.log(isSelected)
 
-// export default GraffitiMarker
+        return(
+            
+                <div style = 
+                    {{ 
+                        backgroundImage: `url(${graffiti.idUser.pictureThumbnailURL})`, 
+                        backgroundSize : 'cover',
+                        height:'100px', 
+                        width:'100px',
+                        transform : 
+                            `translate(calc(${(graffiti.idUser.pictureURLDescription.posX / 2) * 100}px - 50%), calc(${(graffiti.idUser.pictureURLDescription.posY / 2) * 100}px - 50%))
+                            scale(${graffiti.idUser.pictureURLDescription.scale})
+                            rotate(${graffiti.idUser.pictureURLDescription.rotation}rad)
+                            `
+                    }}>
+                        GraffitiMarker
+                </div>
+        )
+    }
+}
