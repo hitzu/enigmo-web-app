@@ -32,7 +32,22 @@ class ClusterMap extends React.Component {
   markersOnScreen = {}; 
   point_counts = [];
   totals;
+  markerUserLocation;
 
+  emitOpenGraffiti = (idGraffiti)=>{
+    this.socket.emit("open/Graffiti",{UIID:this.UIID, idGraffiti:idGraffiti})
+  }
+  emitOpenEvent = (idEvent)=>{
+    this.socket.emit("open/Event",{UIID:this.UIID, idEvent:idEvent})
+  }
+  emitOpenStamp = (idStamp)=>{
+    this.socket.emit("open/Stamp",{UIID:this.UIID, idStamp:idStamp})
+  }
+  emitOpenCardLocation = (idCardLocation)=>{
+    this.socket.emit("open/CardLocation",{UIID:this.UIID, idCardLocation:idCardLocation})
+  }
+
+  
   updateMarkers = () => {
     // keep track of new markers
     let newMarkers = {};
@@ -135,10 +150,6 @@ class ClusterMap extends React.Component {
     // otherwise, it is visible and we need to add it to our markersOnScreen object
       this.markersOnScreen = newMarkers;
   };
-
-
-  markerUserLocation;
-
   getGeoJsonFeature = (item, typeItem) => {
     let location = item.location.coordinates
     return {
@@ -164,20 +175,20 @@ class ClusterMap extends React.Component {
     // let payload = jwt.verify(this.token,process.env.REACT_APP_SECRET_KEY)
     // console.log(payload);
     
-    // this.UIID = payload.UIID
-    // this.socket.on("update/userLocation",content =>{
-    //   this.markerUserLocation.setLngLat([content.lng,content.lat])
-    // })
-    // this.socket.on("flyTo",content =>{
-    //   this.map.flyTo({
-    //     center: content.center,
-    //     zoom: content.zoom,duration:200
-    //   })
-    //   setTimeout(() => {
-    //     this.updateMarkers()
+    this.UIID = payload.UIID
+    this.socket.on("update/userLocation",content =>{
+      this.markerUserLocation.setLngLat([content.lng,content.lat])
+    })
+    this.socket.on("flyTo",content =>{
+      this.map.easeTo({
+        center: content.center,
+        zoom: content.zoom,duration:200
+      })
+      setTimeout(() => {
+        this.updateMarkers()
         
-    //   }, 500);
-    // })
+      }, 600);
+    })
 
     this.socket.emit("subscribe",this.UIID)
 
