@@ -2,7 +2,11 @@ import React from 'react'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
 import ReactDOM from 'react-dom'
+import EventMarker from '../../components/mapComponents/EventMarker.component'
 import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.component'
+import LocationCardMarker from '../../components/mapComponents/LocationCardMarker.component'
+import SnifferCardMarker from '../../components/mapComponents/SnifferCardMarker.component'
+import SnifferPromotionMarker from '../../components/mapComponents/SnifferPromotionMarker.component'
 import socketIOClient from "socket.io-client";
 import jwt from "jsonwebtoken";
 
@@ -43,6 +47,7 @@ class ClusterMap extends React.Component {
   markerUserLocation;
 
   emitOpenGraffiti = (idGraffiti)=>{
+    console.log("jajajaja abrieron graffiti")
     this.socket.emit("open/Graffiti",{UIID:this.UIID, idGraffiti:idGraffiti})
   }
   emitOpenEvent = (idEvent)=>{
@@ -92,12 +97,12 @@ class ClusterMap extends React.Component {
                 marker = this.markers[id] = new mapboxgl.Marker({
                   element: elGraffiti
                 }).setLngLat(coordinates);
-                elGraffiti.addEventListener('click', () => 
-                  { 
-                      alert("Marker Clicked."+ props.id);
-                      this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
-                  }
-                );
+                // elGraffiti.addEventListener('click', () => 
+                //   { 
+                //       alert("Marker Clicked."+ props.id);
+                //       this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
+                //   }
+                // );
                 break;
               default :
                 const elOtro = this.createOtro(props, "totals")
@@ -244,7 +249,7 @@ class ClusterMap extends React.Component {
       this.markerUserLocation.addTo(this.map)
 
       const enigmoDataReceived = await axios({
-      url : `http://192.168.10.143:3003/stamp/sniffer`,
+      url : `http://192.168.10.149:3003/stamp/sniffer`,
       method : 'POST',
       data : {
           "distance":30000000,
@@ -256,7 +261,7 @@ class ClusterMap extends React.Component {
       })
 
       const enigmoGraffitiReceived = await axios({
-        url : `http://192.168.10.143:3003/graffiti/byLocation`,
+        url : `http://192.168.10.149:3003/graffiti/byLocation`,
         method : 'POST',
         data : {
             "distance":30000000,
@@ -422,17 +427,14 @@ class ClusterMap extends React.Component {
     this.createGraffiti = (props, totals) => {
       
       var divContainer = document.createElement("div");
-      divContainer.style.width = "100px";
-      divContainer.style.height = "100px";
-      divContainer.style.overflow = 'hidden';
-      divContainer.style.borderRadius = "50%"
+      divContainer.style.display = "inline-block"
       var propsJson = JSON.parse(props.item)
 
       ReactDOM.render(
         React.createElement(
           GraffitiMarker, {
-            pictureThumbnailURL : propsJson.idUser.pictureURL,
-            pictureURLDescription : propsJson.idUser.pictureURLDescription
+            graffiti : propsJson,
+            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)}
           }
         ),
         divContainer
