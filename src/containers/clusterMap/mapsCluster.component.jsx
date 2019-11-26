@@ -21,10 +21,16 @@ class ClusterMap extends React.Component {
       lat: props.match.params.lat,
       zoom: 4
     };
+    this.graffitiPreview = React.createRef();
     this.token = props.match.params.token
     this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
     this.socket = socketIOClient(this.endpoint);
     this.UIID = "none"
+  }
+
+  hideAllPreviews = () => {
+    console.log("jajaja entro aqui ")
+    this.graffitiPreview.current.hidePreviewGraffiti()
   }
 
 
@@ -323,6 +329,10 @@ class ClusterMap extends React.Component {
           this.updateMarkers()
         });
         this.map.on('moveend', this.updateMarkers);
+        this.map.on('dragstart', () => {
+          console.log("empiezo a draggear")
+          this.hideAllPreviews()
+        })
         this.updateMarkers();
       });
 
@@ -407,8 +417,9 @@ class ClusterMap extends React.Component {
         React.createElement(
           GraffitiMarker, {
             graffiti : propsJson,
-            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)}
-          }
+            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
+            ref : this.graffitiPreview
+          }, 
         ),
         divContainer
       );

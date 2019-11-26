@@ -85,7 +85,13 @@ export default class GraffitiMarker extends React.Component {
 
     selectGraffiti = () => { 
         this.setState( (state) => {
-            return { isSelected : !state.isSelected } 
+            return { isSelected : true } 
+        })
+    }
+
+    hidePreviewGraffiti() {
+        this.setState( (state) => {
+            return { isSelected : false } 
         })
     }
 
