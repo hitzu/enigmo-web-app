@@ -196,9 +196,7 @@ class ClusterMap extends React.Component {
     }
     this.socket.on("update/filters",content =>{
       if (content.filters && validateFiltersStruct(content.filters)) {
-        this.setState({filters:content.filters})
-        console.log("nuevos filtros ",this.state.filters);
-        
+        this.setState({filters:content.filters})        
       }else{console.error("invalid struct filter Received",content.filters)}
     })
     this.socket.on("update/MapStyle",content =>{
@@ -453,23 +451,7 @@ class ClusterMap extends React.Component {
       return div
     }
   }
-  holapuercaClick = (style)=>{
-    console.log("el estilo --->",style);
-    // this.socket.emit("update/MapStyle",{UIID:this.UIID,mapStyle:style});
-     this.socket.emit("update/filters",{UIID:this.UIID,filters:{
-      from:"mine",
-      locationCards:true,
-      text:true,
-      video:true,
-      audio:true,
-      image:false,
-      stamps:true,
-      stickers:true,
-      top:"ice",
-      time:1 //una hora despues de 7 dias, eso representa all
-    }});
 
-  }
   render() {
     const { lng, lat, zoom } = this.state;
 
