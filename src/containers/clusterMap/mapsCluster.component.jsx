@@ -20,6 +20,7 @@ class ClusterMap extends React.Component {
       lng: props.match.params.lng,
       lat: props.match.params.lat,
       zoom: 4,
+      isSelected : false,
       filters:{
         from:"all",
         locationCards:true,
@@ -356,7 +357,15 @@ class ClusterMap extends React.Component {
         this.map.on('moveend', this.updateMarkers);
         this.map.on('dragstart', () => {
           console.log("empiezo a draggear")
-          this.hideAllPreviews()
+          this.setState( {isSelected : true})
+          console.log(this.state.isSelected)
+          //this.hideAllPreviews()
+        })
+
+        this.map.on('dragend', () => {
+          console.log("finalizo de draggear")
+          this.setState( {isSelected : false})
+          console.log(this.state.isSelected)
         })
         this.updateMarkers();
       });
@@ -441,6 +450,7 @@ class ClusterMap extends React.Component {
       ReactDOM.render(
         React.createElement(
           GraffitiMarker, {
+            isSelected : this.state.isSelected,
             graffiti : propsJson,
             emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
             ref : this.graffitiPreview
