@@ -64,6 +64,7 @@ class ClusterMap extends React.Component {
           const id = props.id
           let marker = this.markers[id];
           if (!marker){
+
             this.totals = this.getPointCount(features);
             // create an html element (more on this later)
             
@@ -73,24 +74,21 @@ class ClusterMap extends React.Component {
                 marker = this.markers[id] = new mapboxgl.Marker({
                   element: elLocation
                 }).setLngLat(coordinates);
+                elLocation.addEventListener('click', () => { this.map.flyTo({center: coordinates}); } );
                 break;
               case "SnifferCards" : 
                 const elSnifferCard = this.createSnifferCard(props, "totals")
                 marker = this.markers[id] = new mapboxgl.Marker({
                   element: elSnifferCard
                 }).setLngLat(coordinates);
+                elSnifferCard.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
                 break;
               case "graffiti" : 
                 const elGraffiti = this.createGraffiti(props, "totals")
                 marker = this.markers[id] = new mapboxgl.Marker({
                   element: elGraffiti
                 }).setLngLat(coordinates);
-                // elGraffiti.addEventListener('click', () => 
-                //   { 
-                //       alert("Marker Clicked."+ props.id);
-                //       this.socket.emit("showCallout/graffiti",{idGraffiti:"putoidGraffiti!!!",UIID:this.UIID})
-                //   }
-                // );
+                elGraffiti.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
                 break;
               default :
                 const elOtro = this.createOtro(props, "totals")
@@ -223,7 +221,7 @@ class ClusterMap extends React.Component {
       this.markerUserLocation.addTo(this.map)
 
       const enigmoDataReceived = await axios({
-      url : `http://192.168.10.149:3003/stamp/sniffer`,
+      url : `http://192.168.10.166:3003/stamp/sniffer`,
       method : 'POST',
       data : {
           "distance":30000000,
@@ -235,7 +233,7 @@ class ClusterMap extends React.Component {
       })
 
       const enigmoGraffitiReceived = await axios({
-        url : `http://192.168.10.149:3003/graffiti/byLocation`,
+        url : `http://192.168.10.166:3003/graffiti/byLocation`,
         method : 'POST',
         data : {
             "distance":30000000,
@@ -320,7 +318,6 @@ class ClusterMap extends React.Component {
             lat: this.map.getCenter().lat,
             zoom: this.map.getZoom()
           })
-          console.log("chasssss");
           
           this.socket.emit("update/userLocation",{UIID:this.UIID,lat:this.state.lat,lng:this.state.lng})
           this.updateMarkers()
