@@ -15,7 +15,19 @@ class ClusterMap extends React.Component {
     this.state = {
       lng: props.match.params.lng,
       lat: props.match.params.lat,
-      zoom: 4
+      zoom: 4,
+      filters:{
+        from:"all",
+        locationCards:true,
+        text:true,
+        video:true,
+        audio:true,
+        image:true,
+        stamps:true,
+        stickers:true,
+        top:"fire",
+        time:169 //una hora despues de 7 dias, eso representa all
+      }
     };
     this.token = props.match.params.token
     this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
@@ -170,8 +182,30 @@ class ClusterMap extends React.Component {
     };
     let payload = jwt.verify(this.token,process.env.REACT_APP_SECRET_KEY)
     console.log(payload);
-    
     this.UIID = payload.UIID
+    const validateFiltersStruct = (filters)=>{
+      var isValid = true
+      let keysFilters = ["from","locationCards","text","video","audio","image","stamps","stickers","top","time"]
+      keysFilters.forEach(e => {
+        if (!Object.keys(filters).includes(e)){
+          isValid = false
+          return;
+        }
+      });
+      return isValid
+    }
+    this.socket.on("update/filters",content =>{
+      if (content.filters && validateFiltersStruct(content.filters)) {
+        this.setState({filters:content.filters})
+        console.log("nuevos filtros ",this.state.filters);
+        
+      }else{console.error("invalid struct filter Received",content.filters)}
+    })
+    this.socket.on("update/MapStyle",content =>{
+      if (content.mapStyle && ["dark-v10",'light-v10','satellite-v9'].includes(content.mapStyle)) {
+        this.map.setStyle('mapbox://styles/mapbox/' + content.mapStyle);
+      }else{console.error("invalid map style Received",content.mapStyle)}
+    })
     this.socket.on("update/userLocation",content =>{
       this.markerUserLocation.setLngLat([content.lng,content.lat])
     })
@@ -308,9 +342,7 @@ class ClusterMap extends React.Component {
             lng: this.map.getCenter().lng,
             lat: this.map.getCenter().lat,
             zoom: this.map.getZoom()
-          })
-          console.log("chasssss");
-          
+          })          
           this.socket.emit("update/userLocation",{UIID:this.UIID,lat:this.state.lat,lng:this.state.lng})
           this.updateMarkers()
         });
@@ -421,7 +453,23 @@ class ClusterMap extends React.Component {
       return div
     }
   }
+  holapuercaClick = (style)=>{
+    console.log("el estilo --->",style);
+    // this.socket.emit("update/MapStyle",{UIID:this.UIID,mapStyle:style});
+     this.socket.emit("update/filters",{UIID:this.UIID,filters:{
+      from:"mine",
+      locationCards:true,
+      text:true,
+      video:true,
+      audio:true,
+      image:false,
+      stamps:true,
+      stickers:true,
+      top:"ice",
+      time:1 //una hora despues de 7 dias, eso representa all
+    }});
 
+  }
   render() {
     const { lng, lat, zoom } = this.state;
 
