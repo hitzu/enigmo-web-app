@@ -45,7 +45,7 @@ class MarkerContainer extends React.Component {
         return(
             <div 
                 style = {{ 
-                    display: "inline-block",
+                    display: "inline-block"
                 }}>
                 { this.getContentByElementType(typeToElement, element) }
             </div>

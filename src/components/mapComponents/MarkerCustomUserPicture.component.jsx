@@ -1,20 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { CustomUserPicture } from '../userComponents'
+import { IndicatorPositionPointMarker } from './'
 
 class MarkerCustomUserPicture extends React.Component {
 
     render(){
 
-        const { userPicture } = this.props;
+        const { userPicture, selectGraffiti } = this.props;
         
         return(
             <div 
                 style = {{
-                    width : "46px",
-                    height : "57px",
-                    backgroundColor : "green"
+                    display : "inline-block"
                 }}
+                onClick={selectGraffiti}
             >
                 <CustomUserPicture
                     pictureURL = { userPicture.pictureURL }

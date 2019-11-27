@@ -12,18 +12,31 @@ class GraffitiMarkerContainer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            graffitiSelected : false,
+            isSelected : false,
             mapIsDragging : this.props.mapIsDragging
         };
     }
 
+    selectGraffiti = () => { 
+        this.setState( (state) => {
+            return { isSelected : true } 
+        })
+    }
+
+    hidePreviewGraffiti() {
+        this.setState( (state) => {
+            return { isSelected : false } 
+        })
+    }
+
     getElementByState(){
-        return !this.state.graffitiSelected ? 
-        <GraffitiMarkerNotSelected
+        return !this.state.isSelected ? 
+        <GraffitiMarkerNotSelected 
+            selectGraffiti = { () => {this.selectGraffiti(this.props.graffiti._id)} }
             graffiti = {this.props.graffiti}
         ></GraffitiMarkerNotSelected>
         :
-        <GraffitiMarkerSelected
+        <GraffitiMarkerSelected 
             graffiti = {this.props.graffiti}
         ></GraffitiMarkerSelected>
         

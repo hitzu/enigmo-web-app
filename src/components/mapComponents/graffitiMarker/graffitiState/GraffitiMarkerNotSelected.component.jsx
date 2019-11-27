@@ -1,22 +1,31 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { MarkerCustomUserPicture } from '../../'
+import { MarkerCustomUserPicture, IndicatorPositionPointMarker} from '../../'
+import { IconRepresentativeGraffitiType } from './graffitiPreviewComponents'
 
 class GraffitiMarkerNotSelected extends React.Component {
 
     static propTypes = {
-        graffiti : PropTypes.object.isRequired
+        graffiti : PropTypes.object.isRequired,
+        selectGraffiti : PropTypes.func.isRequired
     };
 
     render (){
 
-        const { graffiti } = this.props
-        console.log("imageData", graffiti.idUser)
+        const { graffiti, selectGraffiti } = this.props
+
         return (
-            <MarkerCustomUserPicture 
-                userPicture = { graffiti.idUser }
-            >
-            </MarkerCustomUserPicture>
+            <div >
+                <>    
+                   <MarkerCustomUserPicture 
+                        selectGraffiti = { selectGraffiti }
+                        userPicture = { graffiti.idUser }>        
+                    </MarkerCustomUserPicture>
+                    <IconRepresentativeGraffitiType
+                            graffitiType = {graffiti.interaction.contentType}/>
+                </>
+                <IndicatorPositionPointMarker/>
+            </div>
         )
     }
 }
