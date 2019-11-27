@@ -2,7 +2,7 @@ import React from 'react'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
 import ReactDOM from 'react-dom'
-import GraffitiMarker from '../../components/mapComponents/graffitiMarker/GraffitiMarker.component'
+import { MarkerCluster, MarkerContainer } from '../../components/mapComponents'
 import socketIOClient from "socket.io-client";
 import jwt from "jsonwebtoken";
 
@@ -82,36 +82,48 @@ class ClusterMap extends React.Component {
 
             this.totals = this.getPointCount(features);
             // create an html element (more on this later)
+
+            var el = document.createElement("div");
+            ReactDOM.render(
+              <MarkerContainer 
+                element = {props}>
+              </MarkerContainer>,
+              el
+            )
+            // create the marker object passing the html element and the coordinates
+            marker = this.markers[id] = new mapboxgl.Marker({
+              element: el
+            }).setLngLat(coordinates);
             
-            switch (props.typeToElement ){
-              case "locationsCards" :
-                const elLocation = this.createLocationCard(props, "totals");
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elLocation
-                }).setLngLat(coordinates);
-                elLocation.addEventListener('click', () => { this.map.flyTo({center: coordinates}); } );
-                break;
-              case "SnifferCards" : 
-                const elSnifferCard = this.createSnifferCard(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elSnifferCard
-                }).setLngLat(coordinates);
-                elSnifferCard.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-                break;
-              case "graffiti" : 
-                const elGraffiti = this.createGraffiti(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elGraffiti
-                }).setLngLat(coordinates);
-                elGraffiti.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-                break;
-              default :
-                const elOtro = this.createOtro(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elOtro
-                }).setLngLat(coordinates);
-                break;
-            }
+            // switch (props.typeToElement ){
+            //   case "locationsCards" :
+            //     const elLocation = this.createLocationCard(props, "totals");
+            //     marker = this.markers[id] = new mapboxgl.Marker({
+            //       element: elLocation
+            //     }).setLngLat(coordinates);
+            //     elLocation.addEventListener('click', () => { this.map.flyTo({center: coordinates}); } );
+            //     break;
+            //   case "SnifferCards" : 
+            //     const elSnifferCard = this.createSnifferCard(props, "totals")
+            //     marker = this.markers[id] = new mapboxgl.Marker({
+            //       element: elSnifferCard
+            //     }).setLngLat(coordinates);
+            //     elSnifferCard.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
+            //     break;
+            //   case "graffiti" : 
+            //     const elGraffiti = this.createGraffiti(props, "totals")
+            //     marker = this.markers[id] = new mapboxgl.Marker({
+            //       element: elGraffiti
+            //     }).setLngLat(coordinates);
+            //     elGraffiti.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
+            //     break;
+            //   default :
+            //     const elOtro = this.createOtro(props, "totals")
+            //     marker = this.markers[id] = new mapboxgl.Marker({
+            //       element: elOtro
+            //     }).setLngLat(coordinates);
+            //     break;
+            // }
             // create the marker object passing the html element and the coordinates
             
           }
@@ -129,21 +141,19 @@ class ClusterMap extends React.Component {
         let marker = this.markers[id];
         // if that marker doesn't exist yet, create it
         if (!marker) {
-          this.totals = this.getPointCount(features);
           // create an html element (more on this later)
-          const el = this.createClusterChido(props, this.totals);
+          var el = document.createElement("div");
+          ReactDOM.render(
+            <MarkerCluster 
+              numberElements = {props.point_count_abbreviated}>
+            </MarkerCluster>,
+            el
+          )
           // create the marker object passing the html element and the coordinates
           marker = this.markers[id] = new mapboxgl.Marker({
             element: el
           }).setLngLat(coordinates);
-          // el.addEventListener('click', () => 
-          //   { 
-          //       console.log("desde el cluster"+ props)
-          //       alert("Marker Clicked."+ props);
-          //   }
-          // );
         }
-        
         // create an object in our newMarkers object with our current marker representing the current cluster
         newMarkers[id] = marker;
         
@@ -250,7 +260,7 @@ class ClusterMap extends React.Component {
       this.markerUserLocation.addTo(this.map)
 
       const enigmoDataReceived = await axios({
-      url : `http://192.168.10.166:3003/stamp/sniffer`,
+      url : `https://api2.enigmo.mx:3003/stamp/sniffer`,
       method : 'POST',
       data : {
           "distance":30000000,
@@ -262,7 +272,7 @@ class ClusterMap extends React.Component {
       })
 
       const enigmoGraffitiReceived = await axios({
-        url : `http://192.168.10.166:3003/graffiti/byLocation`,
+        url : `https://api2.enigmo.mx:3003/graffiti/byLocation`,
         method : 'POST',
         data : {
             "distance":30000000,
@@ -378,35 +388,6 @@ class ClusterMap extends React.Component {
       };
     });
 
-    this.createClusterChido = (props, totals) => {
-      var div = document.createElement("div");
-      var colorBackground = "rgba(0,0,0,0)"
-
-      if ( props.point_count_abbreviated <= 15 ){
-        colorBackground = "rgba(4,36,166,0.75)"
-      }
-      else if(props.point_count_abbreviated > 15 && props.point_count_abbreviated <= 25){
-        colorBackground = "rgba(144,206,231,0.75)"
-      }
-      else if(props.point_count_abbreviated > 25 && props.point_count_abbreviated <= 35){
-        colorBackground = "rgba(251,172,1,0.75)"
-      }
-      else{
-        colorBackground = "rgba(244,47,1,0.75)"
-      }
-
-      div.style.width = "40px";
-      div.style.height = "40px";
-      div.style.borderRadius = "20px"
-      div.style.borderWidth = "thin"
-      div.style.backgroundColor = colorBackground
-      div.style.borderColor = "white"
-      div.style.textAlign = "center"
-      div.style.color = "white";
-      div.innerHTML = props.point_count_abbreviated;
-      return div
-    }
-
     this.createLocationCard = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "100px";
@@ -437,26 +418,26 @@ class ClusterMap extends React.Component {
       return div
     }
 
-    this.createGraffiti = (props, totals) => {
+    // this.createGraffiti = (props, totals) => {
       
-      var divContainer = document.createElement("div");
-      divContainer.style.display = "inline-block"
-      var propsJson = JSON.parse(props.item)
+    //   var divContainer = document.createElement("div");
+    //   divContainer.style.display = "inline-block"
+    //   var propsJson = JSON.parse(props.item)
 
-      ReactDOM.render(
-        React.createElement(
-          GraffitiMarker, {
-            isSelected : this.state.isSelected,
-            graffiti : propsJson,
-            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
-            ref : this.graffitiPreview
-          }, 
-        ),
-        divContainer
-      );
+    //   ReactDOM.render(
+    //     React.createElement(
+    //       GraffitiMarker, {
+    //         isSelected : this.state.isSelected,
+    //         graffiti : propsJson,
+    //         emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
+    //         ref : this.graffitiPreview
+    //       }, 
+    //     ),
+    //     divContainer
+    //   );
 
-      return divContainer
-    }
+    //   return divContainer
+    // }
     
     this.createOtro = (props, totals) => {
       var div = document.createElement("div");
