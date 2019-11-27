@@ -5,7 +5,7 @@ import { GraffitiMarkerNotSelected, GraffitiMarkerSelected } from './graffitiSta
 class GraffitiMarkerContainer extends React.Component {
 
     static propTypes = {
-        element : PropTypes.object.isRequired,
+        graffiti : PropTypes.object.isRequired,
         mapIsDragging : PropTypes.bool.isRequired
     };
 
@@ -18,16 +18,20 @@ class GraffitiMarkerContainer extends React.Component {
     }
 
     getElementByState(){
-        return this.state.graffitiSelected ? 
-        <GraffitiMarkerSelected></GraffitiMarkerSelected>
+        return !this.state.graffitiSelected ? 
+        <GraffitiMarkerNotSelected
+            graffiti = {this.props.graffiti}
+        ></GraffitiMarkerNotSelected>
         :
-        <GraffitiMarkerNotSelected></GraffitiMarkerNotSelected>
+        <GraffitiMarkerSelected
+            graffiti = {this.props.graffiti}
+        ></GraffitiMarkerSelected>
         
     }
 
     render(){
 
-        console.log(this.state.graffitiSelected)
+        console.log(this.props.graffiti)
         return (
             <>
                 { this.getElementByState() }

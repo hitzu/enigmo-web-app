@@ -82,11 +82,12 @@ class ClusterMap extends React.Component {
 
             this.totals = this.getPointCount(features);
             // create an html element (more on this later)
-
+            var propsJson = JSON.parse(props.item)
             var el = document.createElement("div");
             ReactDOM.render(
               <MarkerContainer 
-                element = {props}>
+                element = { propsJson }
+                typeToElement = { props.typeToElement } >
               </MarkerContainer>,
               el
             )

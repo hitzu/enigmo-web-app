@@ -10,21 +10,29 @@ class CustomUserPicture extends React.Component {
 
     render(){
 
-        const { pictureURL, pictureURLDescription } = this.props;
+        const { pictureURL, pictureURLDescription, width, height } = this.props;
 
         return(
-            <div style = 
-            {{ 
-                backgroundImage: `url(${pictureURL})`, 
-                backgroundSize : 'cover',
-                width: "100%",
-                height: "100%",
-                transform : 
-                    `translate(calc(${(pictureURLDescription.posX / 2) * 100}px - 50%), calc(${(pictureURLDescription.posY / 2) * 100}px - 50%))
+            <div id = "userImageContainer" style = 
+            {{                
+                width: width,
+                height: height,
+                overflow : "hidden",
+                borderRadius : "50%",
+                borderColor : "white"
+            }}>
+                <div id="userImage" style = {{
+                    width: "100%",
+                    height: "100%",
+                    backgroundImage: `url(${pictureURL})`, 
+                    backgroundSize : 'cover',
+                    transform : 
+                    `translate(calc(${(pictureURLDescription.posX / 2) * width}px - 50%), calc(${(pictureURLDescription.posY / 2) * height}px - 50%))
                     scale(${pictureURLDescription.scale})
                     rotate(${pictureURLDescription.rotation}rad)
                     `
-            }}>
+                }}>
+                </div>
             </div>
         )
 

@@ -6,6 +6,7 @@ class MarkerContainer extends React.Component {
 
     static propTypes = {
         element : PropTypes.object.isRequired,
+        typeToElement : PropTypes.string.isRequired,
         mapIsDragging : PropTypes.bool.isRequired
     };
     
@@ -30,7 +31,7 @@ class MarkerContainer extends React.Component {
             case "graffiti" :
             return (
                 <GraffitiMarkerContainer 
-                    graffiti = { element.item }
+                    graffiti = { element }
                     mapIsDragging = { this.state.mapIsDragging } >
                 </GraffitiMarkerContainer>
             )
@@ -39,14 +40,14 @@ class MarkerContainer extends React.Component {
 
     render(){
 
-        const { element } = this.props;
+        const { element, typeToElement } = this.props;
 
         return(
             <div 
                 style = {{ 
                     display: "inline-block",
                 }}>
-                { this.getContentByElementType(element.typeToElement, element) }
+                { this.getContentByElementType(typeToElement, element) }
             </div>
         )
 

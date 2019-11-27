@@ -4,11 +4,25 @@ import { CustomUserPicture } from '../userComponents'
 
 class MarkerCustomUserPicture extends React.Component {
 
-
     render(){
 
+        const { userPicture } = this.props;
+        
         return(
-            <h1>holas jajaja</h1>
+            <div 
+                style = {{
+                    width : "46px",
+                    height : "57px",
+                    backgroundColor : "green"
+                }}
+            >
+                <CustomUserPicture
+                    pictureURL = { userPicture.pictureURL }
+                    pictureURLDescription = { userPicture.pictureURLDescription }
+                    width = "46px"
+                    height = "46px"
+                ></CustomUserPicture>
+            </div>
         )
 
     }
