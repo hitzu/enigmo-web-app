@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class CustomPositionUserPicture extends React.Component {
+class CustomUserPicture extends React.Component {
 
     static propTypes = { 
         pictureURL : PropTypes.string.isRequired,
@@ -32,4 +32,4 @@ class CustomPositionUserPicture extends React.Component {
 
 }
 
-export { CustomPositionUserPicture }
+export { CustomUserPicture }

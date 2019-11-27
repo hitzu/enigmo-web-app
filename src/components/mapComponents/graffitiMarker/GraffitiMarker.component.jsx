@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { TextGraffitiPreview, ImageGraffitiPreview, VideoGraffitiPreview, AudioGraffitiPreview } from './graffitiPreviewComponents'
-import { CustomPositionUserPicture } from '../userComponents'
+import { CustomPositionUserPicture } from '../../userComponents'
 
 export default class GraffitiMarker extends React.Component {
 
@@ -16,13 +16,7 @@ export default class GraffitiMarker extends React.Component {
         };
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        const { isSelected } = this.props;
-        console.log("entro a actualizar")
-    }
-
     getGraffitiContent(graffiti){
-        console.log(graffiti.interaction)
         switch (graffiti.interaction.contentType){
             case "text" :
                 return (

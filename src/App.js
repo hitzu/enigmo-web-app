@@ -12,7 +12,7 @@ const App = () => {
       <Switch>
         <Route exact path = "/" component  = {welcomeScreen} />
         <ProtectedRouteMap exact path = '/clusterMap/:lat?/:lng?/:token?' component = { ClusterMap } ClusterMap />
-        <ProtectedRouteMap exact path = '/heatMap/:lat?/:lng?/:token?' component = { HeatMap } HeatMap />
+        {/* <ProtectedRouteMap exact path = '/heatMap/:lat?/:lng?/:token?' component = { HeatMap } HeatMap /> */}
         <Route path = "*" component = { () => "404 NOT FOUND"} ></Route>
       </Switch>
     </main>   

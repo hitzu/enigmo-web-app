@@ -2,11 +2,7 @@ import React from 'react'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
 import ReactDOM from 'react-dom'
-import EventMarker from '../../components/mapComponents/EventMarker.component'
-import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.component'
-import LocationCardMarker from '../../components/mapComponents/LocationCardMarker.component'
-import SnifferCardMarker from '../../components/mapComponents/SnifferCardMarker.component'
-import SnifferPromotionMarker from '../../components/mapComponents/SnifferPromotionMarker.component'
+import GraffitiMarker from '../../components/mapComponents/graffitiMarker/GraffitiMarker.component'
 import socketIOClient from "socket.io-client";
 import jwt from "jsonwebtoken";
 
