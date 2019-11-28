@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { GraffitiMarkerContainer } from './graffitiMarker'
+import { LocationCardMarkerContainer } from './locationCardMarker'
+import { SnifferCardMarkerContainer } from './SnifferCardMarker'
 
 class MarkerContainer extends React.Component {
 
@@ -21,18 +23,24 @@ class MarkerContainer extends React.Component {
         switch (elementType){
             case "locationsCards" :
             return (
-                <h1>Soy un locations</h1>
+                <LocationCardMarkerContainer
+                        locationCard = { element }
+                >
+
+                </LocationCardMarkerContainer>
             )
             case "SnifferCards" :
             return (
-                <h1>Soy un sniffer</h1>
+                <SnifferCardMarkerContainer>Soy un sniffer
+
+                </SnifferCardMarkerContainer>
             )
                 
             case "graffiti" :
+                console.log("markerContainer", element)
             return (
                 <GraffitiMarkerContainer 
-                    graffiti = { element }
-                    mapIsDragging = { this.state.mapIsDragging } >
+                    graffiti = { element } >
                 </GraffitiMarkerContainer>
             )
         }

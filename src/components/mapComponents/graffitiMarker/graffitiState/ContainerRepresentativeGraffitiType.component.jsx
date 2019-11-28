@@ -1,13 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { IconRepresentativeGraffitiType } from './' 
 
-class IconRepresentativeGraffitiType extends React.Component {
+class ContainerRepresentativeGraffitiType extends React.Component {
 
     static propTypes = {
         graffitiType : PropTypes.string.isRequired
     };
 
-    getIconByType(graffitiType){
+    getGradientByType(graffitiType){
         switch (graffitiType) {
             case "audio":
             return "linear-gradient(0deg, #E60000 38%, #FF8460 100%)"
@@ -25,22 +26,24 @@ class IconRepresentativeGraffitiType extends React.Component {
     render(){
 
         const { graffitiType } = this.props
-        console.log("desde el iconRepresentativeGraffiti")
+
+        console.log("desde el container representative", graffitiType)
         return(
             <div style = {{
                 height : "20px",
                 width : "20px",
                 borderRadius : "50%",
-                backgroundImage : this.getIconByType(graffitiType),
+                backgroundImage : this.getGradientByType(graffitiType),
                 position : "absolute",
                 bottom: "0px",
                 right : "0px"
                 
             }}>
-
+                <IconRepresentativeGraffitiType graffitiType = { graffitiType }>
+                </IconRepresentativeGraffitiType>
             </div>
         )
     }
 }
 
-export { IconRepresentativeGraffitiType }
+export { ContainerRepresentativeGraffitiType }

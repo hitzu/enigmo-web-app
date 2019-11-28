@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MarkerCustomUserPicture, IndicatorPositionPointMarker} from '../../'
-import { IconRepresentativeGraffitiType } from './graffitiPreviewComponents'
+import { ContainerRepresentativeGraffitiType } from './'
 
 class GraffitiMarkerNotSelected extends React.Component {
 
@@ -18,10 +18,10 @@ class GraffitiMarkerNotSelected extends React.Component {
             <div >
                 <>    
                    <MarkerCustomUserPicture 
-                        selectGraffiti = { selectGraffiti }
+                        selectElement = { selectGraffiti }
                         userPicture = { graffiti.idUser }>        
                     </MarkerCustomUserPicture>
-                    <IconRepresentativeGraffitiType
+                    <ContainerRepresentativeGraffitiType
                             graffitiType = {graffiti.interaction.contentType}/>
                 </>
                 <IndicatorPositionPointMarker/>

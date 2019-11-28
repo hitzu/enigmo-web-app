@@ -7,14 +7,14 @@ class MarkerCustomUserPicture extends React.Component {
 
     render(){
 
-        const { userPicture, selectGraffiti } = this.props;
+        const { userPicture, selectElement } = this.props;
         
         return(
             <div 
                 style = {{
                     display : "inline-block"
                 }}
-                onClick={selectGraffiti}
+                onClick={selectElement}
             >
                 <CustomUserPicture
                     pictureURL = { userPicture.pictureURL }

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default class LocationCardMarker extends React.Component {
+class SnifferCardMarkerContainer extends React.Component {
 
     static propTypes = {
         pictureThumbnailURL: PropTypes.string.isRequired,
@@ -26,8 +26,10 @@ export default class LocationCardMarker extends React.Component {
                         rotate(${pictureURLDescription.rotation}rad)
                         `
                 }}>
-                    LocationCardMarker
+                    SnifferCardMarker
             </div>
         )
     }
 }
+
+export { SnifferCardMarkerContainer }

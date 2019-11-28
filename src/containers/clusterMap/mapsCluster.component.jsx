@@ -87,7 +87,8 @@ class ClusterMap extends React.Component {
             ReactDOM.render(
               <MarkerContainer 
                 element = { propsJson }
-                typeToElement = { props.typeToElement } >
+                typeToElement = { props.typeToElement } 
+                mapIsDragging = {true}>
               </MarkerContainer>,
               el
             )
