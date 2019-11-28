@@ -7,7 +7,7 @@ class IndicatorPositionPointMarker extends React.Component {
             <div 
                 style = {{
                     position: "absolute",
-                    bottom: "0px",
+                    bottom: "-7px",
                     width : "6px",
                     height : "6px",
                     background: "#373737",

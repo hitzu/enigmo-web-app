@@ -15,9 +15,9 @@ class GraffitiMarkerNotSelected extends React.Component {
         const { graffiti, selectGraffiti } = this.props
 
         return (
-            <div >
+            <>
                 <>    
-                   <MarkerCustomUserPicture 
+                    <MarkerCustomUserPicture 
                         selectElement = { selectGraffiti }
                         userPicture = { graffiti.idUser }>        
                     </MarkerCustomUserPicture>
@@ -25,7 +25,7 @@ class GraffitiMarkerNotSelected extends React.Component {
                             graffitiType = {graffiti.interaction.contentType}/>
                 </>
                 <IndicatorPositionPointMarker/>
-            </div>
+            </>
         )
     }
 }
