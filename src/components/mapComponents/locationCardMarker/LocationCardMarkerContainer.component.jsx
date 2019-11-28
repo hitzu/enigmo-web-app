@@ -43,7 +43,7 @@ class LocationCardMarkerContainer extends React.Component {
 
     render(){
 
-        console.log(this.props)
+        console.log("desde el locationCardMarker", this.props)
 
         return(
             <>

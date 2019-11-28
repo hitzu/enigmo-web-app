@@ -49,7 +49,7 @@ class MarkerContainer extends React.Component {
     render(){
 
         const { element, typeToElement } = this.props;
-
+        console.log(typeToElement, element)
         return(
             <div 
                 style = {{ 
