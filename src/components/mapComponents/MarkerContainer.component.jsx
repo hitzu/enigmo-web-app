@@ -9,38 +9,46 @@ class MarkerContainer extends React.Component {
     static propTypes = {
         element : PropTypes.object.isRequired,
         typeToElement : PropTypes.string.isRequired,
-        mapIsDragging : PropTypes.bool.isRequired
     };
     
     constructor(props) {
         super(props);
         this.state = {
-            mapIsDragging : this.props.mapIsDragging
+            hideAllMarkers:false
         };
     }
 
+    wasSelected = ()=> {
+        this.props.wasSelected()
+        
+    }
+    hidePreviewMarker = ()=>{
+        this.setState({hideAllMarkers : true})
+    }
     getContentByElementType(elementType, element){
         switch (elementType){
             case "locationsCards" :
             return (
                 <LocationCardMarkerContainer
-                        locationCard = { element }
-                >
-
-                </LocationCardMarkerContainer>
+                    locationCard = { element }
+                    disselect = {this.state.hideAllMarkers}
+                    wasSelected = {this.wasSelected}
+                ></LocationCardMarkerContainer>
             )
             case "SnifferCards" :
             return (
-                <SnifferCardMarkerContainer>Soy un sniffer
-
-                </SnifferCardMarkerContainer>
+                <SnifferCardMarkerContainer 
+                    disselect = {this.state.hideAllMarkers}
+                    wasSelected = {this.wasSelected}
+                >Soy un sniffer</SnifferCardMarkerContainer>
             )
                 
             case "graffiti" :
-                console.log("markerContainer", element)
             return (
                 <GraffitiMarkerContainer 
-                    graffiti = { element } >
+                    graffiti = { element } 
+                    wasSelected = {this.wasSelected}
+                    disselect = {this.state.hideAllMarkers}>
                 </GraffitiMarkerContainer>
             )
         }

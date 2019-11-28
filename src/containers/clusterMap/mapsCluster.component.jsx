@@ -15,7 +15,7 @@ class ClusterMap extends React.Component {
     this.state = {
       lng: props.match.params.lng,
       lat: props.match.params.lat,
-      zoom: 13,
+      zoom: 4,
       isSelected : false,
       filters:{
         from:"all",
@@ -30,19 +30,22 @@ class ClusterMap extends React.Component {
         time:169 //una hora despues de 7 dias, eso representa all
       }
     };
-    this.graffitiPreview = React.createRef();
     this.token = props.match.params.token
     this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
     this.socket = socketIOClient(this.endpoint);
     this.UIID = "none"
   }
 
-  hideAllPreviews = () => {
-    console.log("jajaja entro aqui ")
-    this.graffitiPreview.current.hidePreviewGraffiti()
+  hideCurrentSelectedPreview = () => {
+    if (this.currentMarketSelected){
+      this.currentMarketSelected.current.hidePreviewMarker()
+    }
+    this.currentMarketSelected = null 
   }
 
+  currentMarketSelected;
   markers = {};
+  markerRefs = {};
   markersOnScreen = {}; 
   point_counts = [];
   totals;
@@ -63,6 +66,16 @@ class ClusterMap extends React.Component {
   }
 
   
+  MarketWasSelected = (id)=>{
+    console.log("son was selected from MapCluster --> ",id);
+    if (this.currentMarketSelected){
+      console.log("PREVIOUS Market selected --> ",this.currentMarketSelected);
+      this.currentMarketSelected.current.hidePreviewMarker()
+    }
+    this.currentMarketSelected = this.markerRefs[id]
+    console.log("CURRENT Market selected --> ",this.currentMarketSelected);
+  }
+
   updateMarkers = () => {
     // keep track of new markers
     let newMarkers = {};
@@ -83,11 +96,13 @@ class ClusterMap extends React.Component {
             // create an html element (more on this later)
             var propsJson = JSON.parse(props.item)
             var el = document.createElement("div");
+            var newref = React.createRef()
             ReactDOM.render(
               <MarkerContainer 
                 element = { propsJson }
                 typeToElement = { props.typeToElement } 
-                mapIsDragging = {true}>
+                wasSelected = {()=>{this.MarketWasSelected(id)}}
+                ref = {newref} >
               </MarkerContainer>,
               el
             )
@@ -95,7 +110,7 @@ class ClusterMap extends React.Component {
             marker = this.markers[id] = new mapboxgl.Marker({
               element: el
             }).setLngLat(coordinates);
-            
+            this.markerRefs[props.id] = newref
           }
           // create an object in our newMarkers object with our current marker representing the current cluster
           newMarkers[id] = marker;
@@ -149,7 +164,7 @@ class ClusterMap extends React.Component {
     return {
       "type" : "Feature", 
       "properties" : {
-        "id": item._id,
+        "id": item._id+"-"+typeItem,
         "typeToElement" : typeItem,
         "item" : item
       },
@@ -324,6 +339,7 @@ class ClusterMap extends React.Component {
         });
         this.map.on('moveend', this.updateMarkers);
         this.map.on('dragstart', () => {
+          this.hideCurrentSelectedPreview()
         })
 
         this.map.on('dragend', () => {
