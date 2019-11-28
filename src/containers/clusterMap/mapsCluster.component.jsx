@@ -15,7 +15,7 @@ class ClusterMap extends React.Component {
     this.state = {
       lng: props.match.params.lng,
       lat: props.match.params.lat,
-      zoom: 4,
+      zoom: 13,
       isSelected : false,
       filters:{
         from:"all",

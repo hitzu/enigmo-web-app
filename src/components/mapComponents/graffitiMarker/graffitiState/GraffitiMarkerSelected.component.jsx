@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { CustomUserPicture } from '../../../userComponents'
 import { MarkerCustomUserPicture, IndicatorPositionPointMarker} from '../../'
 import { ContainerRepresentativeGraffitiType } from './'
-import { ImageGraffitiPreview } from "./graffitiPreviewComponents"
+import { ImageGraffitiPreview, TextGraffitiPreview } from "./graffitiPreviewComponents"
 
 class GraffitiMarkerSelected extends React.Component {
 
@@ -18,7 +18,9 @@ class GraffitiMarkerSelected extends React.Component {
             case "video" :
             return "linear-gradient(0deg, #622ED0 31%, #BE65FF 98%)"
             case "text":
-            return "linear-gradient(0deg, #008305 5%, #55FF59 95%)"
+            return <TextGraffitiPreview
+                graffitiText = {graffiti.interaction.description}
+            ></TextGraffitiPreview>
             case "image":
             return <ImageGraffitiPreview
                 graffitiImage = {graffiti.interaction.mediaUrl}
@@ -34,14 +36,12 @@ class GraffitiMarkerSelected extends React.Component {
 
         return (
             <div >
-                <div style = {{
-                    border : "2px solid blue",
-                }}
-                >
+                <div>
                     { this.getComponentByType(graffiti) }
                 </div>
                 <>
                     <div style = {{
+                        marginTop : "13px",
                         display : "flex",
                         justifyContent : "center"
                     }}>    

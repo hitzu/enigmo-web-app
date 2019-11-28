@@ -13,11 +13,24 @@ class TextGraffitiPreview extends React.Component {
         console.log("desde el graffitiText", graffitiText)
         return(
             <div style = {{
-                height:'100%', 
-                width:'100%',
-                backgroundColor: 'green'
+                display: "flex",
+                minHeight:'38px', 
+                maxWidth:'212px',
+                wordWrap: "break-word",
+                backgroundImage: "linear-gradient(180deg, #FFFFFF 0%, #F8F8F8 100%)",
+                borderRadius: "19px",
+                fontFamily: "Okomito-Medium",
+                fontSize: "16px",
+                color: "#000000",
+                letterSpacing: "-0.32px",
+                justifyContent : "center",
+                alignItems: "center"
             }}> 
-                <h1>{ graffitiText }</h1>
+                <div style = {{
+                    padding: "10px 12px 10px 12px"
+                }}>
+                    { graffitiText }
+                </div>
             </div>
         )
     }

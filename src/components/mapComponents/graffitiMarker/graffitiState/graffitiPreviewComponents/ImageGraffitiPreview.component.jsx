@@ -13,11 +13,11 @@ class ImageGraffitiPreview extends React.Component {
 
         return(
             <div style = {{
-                height:'100%', 
-                width:'100%',
-                backgroundColor: 'green'
+                height:'256px', 
+                width:'159px',
+                backgroundImage : `url(${graffitiImage})`,
+                backgroundSize : "cover"
             }}> 
-                <img src = { graffitiImage } />
             </div>
         )
     }

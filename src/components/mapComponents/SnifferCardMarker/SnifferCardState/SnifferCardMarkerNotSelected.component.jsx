@@ -14,13 +14,7 @@ class SnifferCardMarkerNotSelected extends React.Component {
          const { snifferCard, selectSnifferCard } = this.props
  
         return (
-            <>
-                <MarkerCustomUserPicture 
-                    selectElement = { selectSnifferCard }
-                    userPicture = { snifferCard.idUser }>        
-                </MarkerCustomUserPicture>  
-                <IndicatorPositionPointMarker/>
-            </>
+            <h1>Soy un Sniffer card seleccionado</h1>
         )
     }
 }
