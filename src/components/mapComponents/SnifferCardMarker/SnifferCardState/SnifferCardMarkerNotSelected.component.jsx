@@ -14,7 +14,7 @@ class SnifferCardMarkerNotSelected extends React.Component {
          const { snifferCard, selectSnifferCard } = this.props
  
         return (
-            <h1>Soy un Sniffer card seleccionado</h1>
+            <h1>Soy un Sniffer card NO seleccionado</h1>
         )
     }
 }

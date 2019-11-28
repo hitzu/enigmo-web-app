@@ -16,6 +16,7 @@ class GraffitiMarkerContainer extends React.Component {
     }
 
     selectGraffiti = () => { 
+        this.props.wasSelected()
         this.setState( (state) => {
             return { isSelected : true } 
         })
@@ -25,6 +26,13 @@ class GraffitiMarkerContainer extends React.Component {
         this.setState( (state) => {
             return { isSelected : false } 
         })
+    }
+
+    componentWillUpdate(nextProps){
+        if (nextProps.disselect && this.state.isSelected) {
+            this.setState({isSelected:false})
+        }
+        
     }
 
     getElementByState(){
@@ -41,7 +49,6 @@ class GraffitiMarkerContainer extends React.Component {
 
     render(){
 
-        console.log(this.props.graffiti)
         return (
             <>
                 { this.getElementByState() }

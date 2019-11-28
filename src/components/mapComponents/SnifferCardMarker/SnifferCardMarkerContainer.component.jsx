@@ -17,7 +17,15 @@ class SnifferCardMarkerContainer extends React.Component {
         };
     }
 
-    selectLocationCard = () => { 
+
+    componentWillUpdate(nextProps){
+        if (nextProps.disselect && this.state.isSelected) {
+            this.setState({isSelected:false})
+        }
+    }
+
+    selectStamp = () => { 
+        this.props.wasSelected()
         this.setState( (state) => {
             return { isSelected : true } 
         })
@@ -32,7 +40,7 @@ class SnifferCardMarkerContainer extends React.Component {
     getElementByState(){
         return !this.state.isSelected ? 
         <SnifferCardMarkerNotSelected 
-            selectLocationCard = { () => {this.selectLocationCard(this.props.locationCard._id)} }
+            selectLocationCard = { () => {this.selectStamp(this.props.locationCard._id)} }
             locationCard = {this.props.locationCard}
         ></SnifferCardMarkerNotSelected>
         :
@@ -43,7 +51,6 @@ class SnifferCardMarkerContainer extends React.Component {
 
     render(){
 
-        console.log(this.props)
 
         return(
             <>

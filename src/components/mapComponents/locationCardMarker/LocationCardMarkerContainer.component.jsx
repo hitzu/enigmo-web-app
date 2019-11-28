@@ -17,7 +17,15 @@ class LocationCardMarkerContainer extends React.Component {
         };
     }
 
+
+    componentWillUpdate(nextProps){
+        if (nextProps.disselect && this.state.isSelected) {
+            this.setState({isSelected:false})
+        }
+    }
+
     selectLocationCard = () => { 
+        this.props.wasSelected()
         this.setState( (state) => {
             return { isSelected : true } 
         })
@@ -42,9 +50,6 @@ class LocationCardMarkerContainer extends React.Component {
     }
 
     render(){
-
-        console.log("desde el locationCardMarker", this.props)
-
         return(
             <>
                 { this.getElementByState() }
