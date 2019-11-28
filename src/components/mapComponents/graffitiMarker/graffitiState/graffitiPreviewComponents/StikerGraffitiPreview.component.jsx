@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-class ImageGraffitiPreview extends React.Component {
+class StikerGraffitiPreview extends React.Component {
 
     static propTypes = { 
         graffitiImage : PropTypes.string.isRequired
@@ -9,13 +9,15 @@ class ImageGraffitiPreview extends React.Component {
 
     render(){
 
-        const { graffitiImage } = this.props
+        const { graffitiStiker } = this.props
 
         return(
             <div style = {{
+                background: "rgba(180,180,180,0.26)",
+                borderRadius: "15px",
                 height:'256px', 
                 width:'159px',
-                backgroundImage : `url(${graffitiImage})`,
+                backgroundImage : `url(${graffitiStiker})`,
                 backgroundSize : "contain",
                 backgroundPosition : "center",
                 backgroundRepeat : "no-repeat",
@@ -28,4 +30,4 @@ class ImageGraffitiPreview extends React.Component {
     }
 }
 
-export { ImageGraffitiPreview }
+export { StikerGraffitiPreview }

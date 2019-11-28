@@ -34,6 +34,7 @@ class ClusterMap extends React.Component {
     this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
     this.socket = socketIOClient(this.endpoint);
     this.UIID = "none"
+    console.log("react", React.version)
   }
 
   hideCurrentSelectedPreview = () => {

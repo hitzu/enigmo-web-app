@@ -4,24 +4,23 @@ import PropTypes from 'prop-types'
 class VideoGraffitiPreview extends React.Component {
 
     static propTypes = { 
-        graffitiDescription : PropTypes.string.isRequired,
         graffitiVideo : PropTypes.string.isRequired
     }
 
     render(){
 
-        const { graffitiDescription, graffitiImage } = this.props
-
-        console.log(graffitiImage)
+        const { graffitiVideo } = this.props
+        console.log("desde el video",graffitiVideo)
         return(
             <div style = {{
-                height:'100%', 
-                width:'100%',
-                backgroundColor: 'green'
+                height:'256px', 
+                width:'159px',
+                backgroundColor: 'black',
+                boxShadow: "0 2px 4px 0 rgba(0,0,0,0.25)",
+                borderRadius: "15px"
             }}> 
-                <h1>{ graffitiDescription }</h1>
-                <video className="video-container video-container-overlay" autoPlay="" loop="" muted="" data-reactid=".0.1.0.0">
-                  <source type="video/mp4" data-reactid=".0.1.0.0.0" src="mov_bbb.mp4"/>
+                <video style = {{ height:'100%', width:'100%' }} controls autoPlay loop = 'true' muted data-reactid=".0.1.0.0">
+                  <source type="video/mp4" data-reactid=".0.1.0.0.0" src={graffitiVideo}/>
                 </video>
             </div>
         )
