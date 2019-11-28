@@ -1,1 +1,1 @@
-export * from './CustomPositionUserPicture.component'
+export * from './CustomUserPicture.component'

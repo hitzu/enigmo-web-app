@@ -2,11 +2,7 @@ import React from 'react'
 import mapboxgl from 'mapbox-gl'
 import axios from "axios";
 import ReactDOM from 'react-dom'
-import EventMarker from '../../components/mapComponents/EventMarker.component'
-import GraffitiMarker from '../../components/mapComponents/GraffitiMarker.component'
-import LocationCardMarker from '../../components/mapComponents/LocationCardMarker.component'
-import SnifferCardMarker from '../../components/mapComponents/SnifferCardMarker.component'
-import SnifferPromotionMarker from '../../components/mapComponents/SnifferPromotionMarker.component'
+import { MarkerCluster, MarkerContainer } from '../../components/mapComponents'
 import socketIOClient from "socket.io-client";
 import jwt from "jsonwebtoken";
 
@@ -33,20 +29,23 @@ class ClusterMap extends React.Component {
         time:169 //una hora despues de 7 dias, eso representa all
       }
     };
-    this.graffitiPreview = React.createRef();
     this.token = props.match.params.token
     this.endpoint = process.env.REACT_APP_SOCKET_URL+"/mapActions"
     this.socket = socketIOClient(this.endpoint);
     this.UIID = "none"
+    console.log("react", React.version)
   }
 
-  hideAllPreviews = () => {
-    console.log("jajaja entro aqui ")
-    this.graffitiPreview.current.hidePreviewGraffiti()
+  hideCurrentSelectedPreview = () => {
+    if (this.currentMarketSelected){
+      this.currentMarketSelected.current.hidePreviewMarker()
+    }
+    this.currentMarketSelected = null 
   }
 
-
+  currentMarketSelected;
   markers = {};
+  markerRefs = {};
   markersOnScreen = {}; 
   point_counts = [];
   totals;
@@ -67,6 +66,16 @@ class ClusterMap extends React.Component {
   }
 
   
+  MarketWasSelected = (id)=>{
+    console.log("son was selected from MapCluster --> ",id);
+    if (this.currentMarketSelected){
+      console.log("PREVIOUS Market selected --> ",this.currentMarketSelected);
+      this.currentMarketSelected.current.hidePreviewMarker()
+    }
+    this.currentMarketSelected = this.markerRefs[id]
+    console.log("CURRENT Market selected --> ",this.currentMarketSelected);
+  }
+
   updateMarkers = () => {
     // keep track of new markers
     let newMarkers = {};
@@ -85,38 +94,23 @@ class ClusterMap extends React.Component {
 
             this.totals = this.getPointCount(features);
             // create an html element (more on this later)
-            
-            switch (props.typeToElement ){
-              case "locationsCards" :
-                const elLocation = this.createLocationCard(props, "totals");
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elLocation
-                }).setLngLat(coordinates);
-                elLocation.addEventListener('click', () => { this.map.flyTo({center: coordinates}); } );
-                break;
-              case "SnifferCards" : 
-                const elSnifferCard = this.createSnifferCard(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elSnifferCard
-                }).setLngLat(coordinates);
-                elSnifferCard.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-                break;
-              case "graffiti" : 
-                const elGraffiti = this.createGraffiti(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elGraffiti
-                }).setLngLat(coordinates);
-                elGraffiti.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-                break;
-              default :
-                const elOtro = this.createOtro(props, "totals")
-                marker = this.markers[id] = new mapboxgl.Marker({
-                  element: elOtro
-                }).setLngLat(coordinates);
-                break;
-            }
+            var propsJson = JSON.parse(props.item)
+            var el = document.createElement("div");
+            var newref = React.createRef()
+            ReactDOM.render(
+              <MarkerContainer 
+                element = { propsJson }
+                typeToElement = { props.typeToElement } 
+                wasSelected = {()=>{this.MarketWasSelected(id)}}
+                ref = {newref} >
+              </MarkerContainer>,
+              el
+            )
             // create the marker object passing the html element and the coordinates
-            
+            marker = this.markers[id] = new mapboxgl.Marker({
+              element: el
+            }).setLngLat(coordinates);
+            this.markerRefs[props.id] = newref
           }
           // create an object in our newMarkers object with our current marker representing the current cluster
           newMarkers[id] = marker;
@@ -132,21 +126,19 @@ class ClusterMap extends React.Component {
         let marker = this.markers[id];
         // if that marker doesn't exist yet, create it
         if (!marker) {
-          this.totals = this.getPointCount(features);
           // create an html element (more on this later)
-          const el = this.createClusterChido(props, this.totals);
+          var el = document.createElement("div");
+          ReactDOM.render(
+            <MarkerCluster 
+              numberElements = {props.point_count_abbreviated}>
+            </MarkerCluster>,
+            el
+          )
           // create the marker object passing the html element and the coordinates
           marker = this.markers[id] = new mapboxgl.Marker({
             element: el
           }).setLngLat(coordinates);
-          // el.addEventListener('click', () => 
-          //   { 
-          //       console.log("desde el cluster"+ props)
-          //       alert("Marker Clicked."+ props);
-          //   }
-          // );
         }
-        
         // create an object in our newMarkers object with our current marker representing the current cluster
         newMarkers[id] = marker;
         
@@ -172,7 +164,7 @@ class ClusterMap extends React.Component {
     return {
       "type" : "Feature", 
       "properties" : {
-        "id": item._id,
+        "id": item._id+"-"+typeItem,
         "typeToElement" : typeItem,
         "item" : item
       },
@@ -253,7 +245,7 @@ class ClusterMap extends React.Component {
       this.markerUserLocation.addTo(this.map)
 
       const enigmoDataReceived = await axios({
-      url : `http://192.168.10.166:3003/stamp/sniffer`,
+      url : `https://api2.enigmo.mx:3003/stamp/sniffer`,
       method : 'POST',
       data : {
           "distance":30000000,
@@ -265,7 +257,7 @@ class ClusterMap extends React.Component {
       })
 
       const enigmoGraffitiReceived = await axios({
-        url : `http://192.168.10.166:3003/graffiti/byLocation`,
+        url : `https://api2.enigmo.mx:3003/graffiti/byLocation`,
         method : 'POST',
         data : {
             "distance":30000000,
@@ -282,14 +274,6 @@ class ClusterMap extends React.Component {
 
       for (const item of enigmoDataReceived.data.SnifferCards) {
         enigmoData.features.push(this.getGeoJsonFeature(item, "SnifferCards"))
-      }
-
-      for (const item of enigmoDataReceived.data.SnifferPromotions) {
-        enigmoData.features.push(this.getGeoJsonFeature(item, "SnifferPromotions"))
-      }
-
-      for (const item of enigmoDataReceived.data.event) {
-        enigmoData.features.push(this.getGeoJsonFeature(item, "event"))
       }
 
       for (const item of enigmoDataReceived.data.locationsCards) {
@@ -355,17 +339,13 @@ class ClusterMap extends React.Component {
         });
         this.map.on('moveend', this.updateMarkers);
         this.map.on('dragstart', () => {
-          console.log("empiezo a draggear")
-          this.hideAllPreviews()
+          this.hideCurrentSelectedPreview()
         })
 
         this.map.on('dragend', () => {
-          console.log("finalizo de draggear")
         })
         this.updateMarkers();
       });
-
-      
 
       this.getPointCount = (features) => {
         features.forEach(f => {
@@ -377,44 +357,7 @@ class ClusterMap extends React.Component {
       };
     });
 
-    this.createClusterChido = (props, totals) => {
-      var div = document.createElement("div");
-      var colorBackground = "rgba(0,0,0,0)"
-
-      if ( props.point_count_abbreviated <= 15 ){
-        colorBackground = "rgba(4,36,166,0.75)"
-      }
-      else if(props.point_count_abbreviated > 15 && props.point_count_abbreviated <= 25){
-        colorBackground = "rgba(144,206,231,0.75)"
-      }
-      else if(props.point_count_abbreviated > 25 && props.point_count_abbreviated <= 35){
-        colorBackground = "rgba(251,172,1,0.75)"
-      }
-      else{
-        colorBackground = "rgba(244,47,1,0.75)"
-      }
-
-      div.style.width = "40px";
-      div.style.height = "40px";
-      div.style.borderRadius = "20px"
-      div.style.borderWidth = "thin"
-      div.style.backgroundColor = colorBackground
-      div.style.borderColor = "white"
-      div.style.textAlign = "center"
-      div.style.color = "white";
-      div.innerHTML = props.point_count_abbreviated;
-      return div
-    }
-
-    this.createLocationCard = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "red";
-      div.style.color = "white";
-      div.innerHTML = props.typeToElement;
-      return div
-    }
+    
     this.createUserLocation = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "30px";
@@ -426,45 +369,7 @@ class ClusterMap extends React.Component {
       return div
     }
 
-    this.createSnifferCard = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "blue";
-      div.style.color = "white";
-      div.innerHTML = "cluster";
-      return div
-    }
-
-    this.createGraffiti = (props, totals) => {
-      
-      var divContainer = document.createElement("div");
-      divContainer.style.display = "inline-block"
-      var propsJson = JSON.parse(props.item)
-
-      ReactDOM.render(
-        React.createElement(
-          GraffitiMarker, {
-            graffiti : propsJson,
-            emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
-            ref : this.graffitiPreview
-          }, 
-        ),
-        divContainer
-      );
-
-      return divContainer
-    }
     
-    this.createOtro = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "pink";
-      div.style.color = "white";
-      div.innerHTML = props.typeToElement;
-      return div
-    }
   }
 
   render() {
