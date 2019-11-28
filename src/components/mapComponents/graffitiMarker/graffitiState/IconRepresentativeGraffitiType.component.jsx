@@ -42,15 +42,6 @@ class IconRepresentativeGraffitiType extends React.Component {
                 backgroundSize : 'contain',
                 backgroundPosition : 'center',
                 backgroundRepeat : "no-repeat",
-                top: "0px",
-                bottom: "0px",
-                margin: "auto",
-                left: "0px",
-                right: "0px",
-                position: "absolute",
-                // top : 0,
-                // left : 0
-                
             }}>
 
             </div>

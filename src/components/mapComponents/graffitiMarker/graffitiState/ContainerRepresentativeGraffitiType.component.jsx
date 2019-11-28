@@ -25,9 +25,8 @@ class ContainerRepresentativeGraffitiType extends React.Component {
 
     render(){
 
-        const { graffitiType } = this.props
+        const { graffitiType, isGraffitiSelected, parentWidth } = this.props
 
-        console.log("desde el container representative", graffitiType)
         return(
             <div style = {{
                 height : "20px",
@@ -36,8 +35,10 @@ class ContainerRepresentativeGraffitiType extends React.Component {
                 backgroundImage : this.getGradientByType(graffitiType),
                 position : "absolute",
                 bottom: "0px",
-                right : "0px"
-                
+                right : !isGraffitiSelected ?  "0px" : `calc(50% - ${parentWidth/2}px)` ,
+                display : "flex",
+                justifyContent : "center",
+                alignItems: "center"
             }}>
                 <IconRepresentativeGraffitiType graffitiType = { graffitiType }>
                 </IconRepresentativeGraffitiType>

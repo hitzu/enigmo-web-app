@@ -11,7 +11,6 @@ class ImageGraffitiPreview extends React.Component {
 
         const { graffitiImage } = this.props
 
-        console.log(graffitiImage)
         return(
             <div style = {{
                 height:'100%', 

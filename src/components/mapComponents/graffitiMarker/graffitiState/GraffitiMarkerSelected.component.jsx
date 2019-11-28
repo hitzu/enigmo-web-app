@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { CustomUserPicture } from '../../../userComponents'
 import { MarkerCustomUserPicture, IndicatorPositionPointMarker} from '../../'
 import { ContainerRepresentativeGraffitiType } from './'
 import { ImageGraffitiPreview } from "./graffitiPreviewComponents"
@@ -7,8 +8,7 @@ import { ImageGraffitiPreview } from "./graffitiPreviewComponents"
 class GraffitiMarkerSelected extends React.Component {
 
     static propTypes = {
-        graffiti : PropTypes.object.isRequired,
-        emitOpenGraffiti : PropTypes.func.isRequired
+        graffiti : PropTypes.object.isRequired
     };
 
     getComponentByType(graffiti){
@@ -21,7 +21,6 @@ class GraffitiMarkerSelected extends React.Component {
             return "linear-gradient(0deg, #008305 5%, #55FF59 95%)"
             case "image":
             return <ImageGraffitiPreview
-                graffitiDescription = {graffiti.interaction.description}
                 graffitiImage = {graffiti.interaction.mediaUrl}
             ></ImageGraffitiPreview>
             case "stiker": 
@@ -34,25 +33,34 @@ class GraffitiMarkerSelected extends React.Component {
         const { graffiti, emitOpenGraffiti } = this.props
 
         return (
-            <div 
-            onClick = {emitOpenGraffiti} >
-                { this.getComponentByType(graffiti) }
+            <div >
                 <div style = {{
-                    display : "flex",
-                    justifContent: "center"
-                }}>
+                    border : "2px solid blue",
+                }}
+                >
+                    { this.getComponentByType(graffiti) }
+                </div>
+                <>
                     <div style = {{
-                        width : "46px"
+                        display : "flex",
+                        justifyContent : "center"
                     }}>    
-                        <MarkerCustomUserPicture 
-                            selectElement = { emitOpenGraffiti }
-                            userPicture = { graffiti.idUser }>        
-                        </MarkerCustomUserPicture>
+                        <CustomUserPicture
+                            pictureURL = { graffiti.idUser.pictureURL }
+                            pictureURLDescription = { graffiti.idUser.pictureURLDescription }
+                            width = "46px"
+                            height = "46px"
+                        >
+                        </CustomUserPicture>
                         <ContainerRepresentativeGraffitiType
-                                graffitiType = {graffiti.interaction.contentType}/>
+                                graffitiType = {graffiti.interaction.contentType}
+                                isGraffitiSelected = {true}
+                                parentWidth = {46}
+                        />
+                                
                     </div>
                     <IndicatorPositionPointMarker/>
-                </div>
+                </>
             </div>
         )
     }
