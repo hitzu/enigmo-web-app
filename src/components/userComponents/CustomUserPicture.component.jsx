@@ -19,7 +19,7 @@ class CustomUserPicture extends React.Component {
                 height: height,
                 overflow : "hidden",
                 borderRadius : "50%",
-                borderColor : "white"
+                boxShadow: "0 2px 2px 0 rgba(0,0,0,0.24)"
             }}>
                 <div id="userImage" style = {{
                     width: "100%",

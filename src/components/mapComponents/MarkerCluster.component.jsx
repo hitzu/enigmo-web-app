@@ -39,11 +39,12 @@ class MarkerCluster extends React.Component {
                     width : '40px',
                     height : '40px',
                     borderRadius : '20px',
-                    borderWidth : "thin",
+                    border: "2px solid #fff",
                     backgroundColor : this.getColor(numberElements),
-                    borderColor : "white",
-                    textAlign : "center",
-                    color : "white"
+                    color : "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                  }}>
                 {numberElements}
             </div>

@@ -42,7 +42,6 @@ class ClusterMap extends React.Component {
     this.graffitiPreview.current.hidePreviewGraffiti()
   }
 
-
   markers = {};
   markersOnScreen = {}; 
   point_counts = [];
@@ -96,37 +95,6 @@ class ClusterMap extends React.Component {
             marker = this.markers[id] = new mapboxgl.Marker({
               element: el
             }).setLngLat(coordinates);
-            
-            // switch (props.typeToElement ){
-            //   case "locationsCards" :
-            //     const elLocation = this.createLocationCard(props, "totals");
-            //     marker = this.markers[id] = new mapboxgl.Marker({
-            //       element: elLocation
-            //     }).setLngLat(coordinates);
-            //     elLocation.addEventListener('click', () => { this.map.flyTo({center: coordinates}); } );
-            //     break;
-            //   case "SnifferCards" : 
-            //     const elSnifferCard = this.createSnifferCard(props, "totals")
-            //     marker = this.markers[id] = new mapboxgl.Marker({
-            //       element: elSnifferCard
-            //     }).setLngLat(coordinates);
-            //     elSnifferCard.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-            //     break;
-            //   case "graffiti" : 
-            //     const elGraffiti = this.createGraffiti(props, "totals")
-            //     marker = this.markers[id] = new mapboxgl.Marker({
-            //       element: elGraffiti
-            //     }).setLngLat(coordinates);
-            //     elGraffiti.addEventListener('click', () => { this.map.flyTo({ center: coordinates }); });
-            //     break;
-            //   default :
-            //     const elOtro = this.createOtro(props, "totals")
-            //     marker = this.markers[id] = new mapboxgl.Marker({
-            //       element: elOtro
-            //     }).setLngLat(coordinates);
-            //     break;
-            // }
-            // create the marker object passing the html element and the coordinates
             
           }
           // create an object in our newMarkers object with our current marker representing the current cluster
@@ -293,14 +261,6 @@ class ClusterMap extends React.Component {
         enigmoData.features.push(this.getGeoJsonFeature(item, "SnifferCards"))
       }
 
-      for (const item of enigmoDataReceived.data.SnifferPromotions) {
-        enigmoData.features.push(this.getGeoJsonFeature(item, "SnifferPromotions"))
-      }
-
-      for (const item of enigmoDataReceived.data.event) {
-        enigmoData.features.push(this.getGeoJsonFeature(item, "event"))
-      }
-
       for (const item of enigmoDataReceived.data.locationsCards) {
         enigmoData.features.push(this.getGeoJsonFeature(item, "locationsCards"))
       }
@@ -364,21 +324,12 @@ class ClusterMap extends React.Component {
         });
         this.map.on('moveend', this.updateMarkers);
         this.map.on('dragstart', () => {
-          console.log("empiezo a draggear")
-          this.setState( {isSelected : true})
-          console.log(this.state.isSelected)
-          //this.hideAllPreviews()
         })
 
         this.map.on('dragend', () => {
-          console.log("finalizo de draggear")
-          this.setState( {isSelected : false})
-          console.log(this.state.isSelected)
         })
         this.updateMarkers();
       });
-
-      
 
       this.getPointCount = (features) => {
         features.forEach(f => {
@@ -390,15 +341,7 @@ class ClusterMap extends React.Component {
       };
     });
 
-    this.createLocationCard = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "red";
-      div.style.color = "white";
-      div.innerHTML = props.typeToElement;
-      return div
-    }
+    
     this.createUserLocation = (props, totals) => {
       var div = document.createElement("div");
       div.style.width = "30px";
@@ -410,46 +353,7 @@ class ClusterMap extends React.Component {
       return div
     }
 
-    this.createSnifferCard = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "blue";
-      div.style.color = "white";
-      div.innerHTML = "cluster";
-      return div
-    }
-
-    // this.createGraffiti = (props, totals) => {
-      
-    //   var divContainer = document.createElement("div");
-    //   divContainer.style.display = "inline-block"
-    //   var propsJson = JSON.parse(props.item)
-
-    //   ReactDOM.render(
-    //     React.createElement(
-    //       GraffitiMarker, {
-    //         isSelected : this.state.isSelected,
-    //         graffiti : propsJson,
-    //         emitOpenGraffiti : () => {this.emitOpenGraffiti(propsJson._id)},
-    //         ref : this.graffitiPreview
-    //       }, 
-    //     ),
-    //     divContainer
-    //   );
-
-    //   return divContainer
-    // }
     
-    this.createOtro = (props, totals) => {
-      var div = document.createElement("div");
-      div.style.width = "100px";
-      div.style.height = "100px";
-      div.style.background = "pink";
-      div.style.color = "white";
-      div.innerHTML = props.typeToElement;
-      return div
-    }
   }
 
   render() {
