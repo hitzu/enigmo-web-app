@@ -5,9 +5,7 @@ import { LocationCardMarkerNotSelected, LocationCardMarkerSelected } from "./loc
 class LocationCardMarkerContainer extends React.Component {
 
     static propTypes = {
-        locationCard : PropTypes.object.isRequired,
-        pictureThumbnailURL: PropTypes.string.isRequired,
-        pictureURLDescription : PropTypes.object.isRequired
+        locationCard : PropTypes.object.isRequired
     };
 
     constructor(props) {

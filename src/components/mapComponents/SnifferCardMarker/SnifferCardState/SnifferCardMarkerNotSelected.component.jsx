@@ -11,10 +11,17 @@ class SnifferCardMarkerNotSelected extends React.Component {
 
     render (){
  
-         const { snifferCard, selectSnifferCard } = this.props
+        const { snifferCard, selectStamp } = this.props
+        console.log("desde el snifferCardNoSelected", snifferCard)
  
         return (
-            <h1>Soy un Sniffer card NO seleccionado</h1>
+            <>
+                <MarkerCustomUserPicture 
+                    selectElement = { selectStamp }
+                    userPicture = { snifferCard.idStamper }>        
+                </MarkerCustomUserPicture>  
+                <IndicatorPositionPointMarker/>
+            </>
         )
     }
 }

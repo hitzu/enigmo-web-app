@@ -5,7 +5,7 @@ import { SnifferCardMarkerNotSelected, SnifferCardMarkerSelected } from "./Sniff
 class SnifferCardMarkerContainer extends React.Component {
 
     static propTypes = {
-        locationCard : PropTypes.object.isRequired,
+        snifferCard : PropTypes.object.isRequired,
         pictureThumbnailURL: PropTypes.string.isRequired,
         pictureURLDescription : PropTypes.object.isRequired
     };
@@ -40,17 +40,16 @@ class SnifferCardMarkerContainer extends React.Component {
     getElementByState(){
         return !this.state.isSelected ? 
         <SnifferCardMarkerNotSelected 
-            selectLocationCard = { () => {this.selectStamp(this.props.locationCard._id)} }
-            locationCard = {this.props.locationCard}
+            selectStamp = { () => {this.selectStamp(this.props.snifferCard._id)} }
+            snifferCard = {this.props.snifferCard}
         ></SnifferCardMarkerNotSelected>
         :
         <SnifferCardMarkerSelected 
-            locationCard = {this.props.locationCard}
+            snifferCard = {this.props.snifferCard}
         ></SnifferCardMarkerSelected>
     }
 
     render(){
-
 
         return(
             <>

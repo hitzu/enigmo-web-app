@@ -12,7 +12,6 @@ class LocationCardMarkerSelected extends React.Component {
     render (){
 
         const { locationCard } = this.props
-        console.log("desde el location mark selected", locationCard.idUser)
         return (
             <div >
                 <div style = {{
@@ -20,8 +19,6 @@ class LocationCardMarkerSelected extends React.Component {
                     width:'159px',
                     backgroundImage : `url(${locationCard.idCard.screenshot})`,
                     backgroundSize : "cover",
-                    // backgroundPosition : "center",
-                    // backgroundRepeat : "no-repeat",
                     backgroundColor : "black",
                     boxShadow: "0 2px 4px 0 rgba(0,0,0,0.25)",
                     borderRadius: "15px",

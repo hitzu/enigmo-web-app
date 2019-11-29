@@ -38,9 +38,10 @@ class MarkerContainer extends React.Component {
             case "SnifferCards" :
             return (
                 <SnifferCardMarkerContainer 
+                    snifferCard = { element }
                     disselect = {this.state.hideAllMarkers}
                     wasSelected = {this.wasSelected}
-                >Soy un sniffer</SnifferCardMarkerContainer>
+                ></SnifferCardMarkerContainer>
             )
                 
             case "graffiti" :
