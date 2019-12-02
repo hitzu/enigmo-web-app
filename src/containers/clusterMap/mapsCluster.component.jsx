@@ -244,8 +244,9 @@ class ClusterMap extends React.Component {
       }).setLngLat([this.state.lng,this.state.lat]);
       this.markerUserLocation.addTo(this.map)
 
+      console.log(process.env.REACT_APP_BASE_URL)
       const enigmoDataReceived = await axios({
-      url : `https://api2.enigmo.mx:3003/stamp/sniffer`,
+      url : `${process.env.REACT_APP_BASE_URL}/stamp/sniffer`,
       method : 'POST',
       data : {
           "distance":30000000,
@@ -257,7 +258,7 @@ class ClusterMap extends React.Component {
       })
 
       const enigmoGraffitiReceived = await axios({
-        url : `https://api2.enigmo.mx:3003/graffiti/byLocation`,
+        url : `${process.env.REACT_APP_BASE_URL}/graffiti/byLocation`,
         method : 'POST',
         data : {
             "distance":30000000,
